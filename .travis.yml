@@ -6,3 +6,10 @@ android:
   components:
     - build-tools-21.1.2
     - android-21
+    - platform-tools
+    - tools
+  # Additional components
+    - extra-google-m2repository
+    - extra-android-m2repository
+    - extra-android-support
+    
