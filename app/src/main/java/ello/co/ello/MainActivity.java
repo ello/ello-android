@@ -62,6 +62,6 @@ public class MainActivity extends ActionBarActivity {
         mWebView.loadUrl("https://ello-webapp-epic.herokuapp.com");
 
         // Force links and redirects to open in the WebView instead of in a browser
-        mWebView.setWebViewClient(new ElloWebViewClient(mWebView));
+        mWebView.setWebViewClient(new ElloWebViewClient(mWebView, this));
     }
 }
