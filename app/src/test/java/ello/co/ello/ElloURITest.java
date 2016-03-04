@@ -19,6 +19,7 @@ import static junit.framework.Assert.assertTrue;
 @RunWith(RobolectricGradleTestRunner.class)
 public class ElloURITest {
 
+    // leaving this in for future reference even though it is empty
     @Before
     public void setup() {
     }

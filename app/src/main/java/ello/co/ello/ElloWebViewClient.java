@@ -24,7 +24,6 @@ public class ElloWebViewClient extends WebViewClient {
     }
 
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        System.out.println(url);
         if (ElloURI.shouldLoadInApp(url)) {
             return false;
         }
