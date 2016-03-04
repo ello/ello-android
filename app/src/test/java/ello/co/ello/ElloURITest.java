@@ -34,7 +34,7 @@ public class ElloURITest {
 
     @Test
     public void testShouldLoadInAppFails() {
-        assertTrue("https://hello.co should NOT load in app", ElloURI.shouldLoadInApp("https://hello.co"));
+        assertFalse("https://hello.co should NOT load in app", ElloURI.shouldLoadInApp("https://hello.co"));
         assertFalse("https://www.google.com should NOT load in app", ElloURI.shouldLoadInApp("https://www.google.com"));
         assertFalse("yo/sean should NOT load in app", ElloURI.shouldLoadInApp("yo/sean"));
     }
