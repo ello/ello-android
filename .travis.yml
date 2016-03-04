@@ -1,19 +1,16 @@
 language: android
 sudo: false
 jdk: oraclejdk7
-
 android:
   components:
-    - build-tools-21.1.2
-    - android-21
-    - platform-tools
-    - tools
-  # Additional components
-    - extra-google-m2repository
-    - extra-android-m2repository
-    - extra-android-support
-    
+  - build-tools-21.1.2
+  - android-21
+  - platform-tools
+  - tools
+  - extra-google-m2repository
+  - extra-android-m2repository
+  - extra-android-support
 notifications:
-  email: false
   slack:
-    secure: ZikJQt/R40LMj27fu2ub9Zq87FF6kZXx3fXy9lz/nWFuc7EWcQC8SzVOCizSp+cq/wrsyBPfitkQwVsFpxx/6aJC0r+t4/zIwK21aLIkkHYLzS5qJpifYeTp7kAiQ0eFWLNLxRSwDVEMlfcvgHl7kGmvJQkzHm9mkQaWBJAJayc=
+    rooms:
+      secure: NVkh+VYIPnEfR7oPbjuWlh+bSJvOUUL6WjKdY5MZ5ejyYjuF8/e2NBSSvdOv+uA7/ah4BP8IHhrppZi14O9X0WzhtVaraKX9WXmTrBmyqNZsCtxx/xtEi+Fho8ZWy7c1YxbdiLD9m7IvDQ+CFs8OyDbQTK2SH2b4Ut5FjY9jELZJRnuJ6KrPLdmw4fRcyiT6WdbySZCyt1TUWSgMPzFYDD+JDhr7VHtu4rb5+gl9hgk3Uory1r2blxzAybrrd8fTtbM3+W94FRhdIhhuJ1AQ9fApQrW2cJqmEnwoOOOMKlfmXKMRC92HxoFStLSiOCkAMxlNIAZmoHtvl+b1kA4U+oQ6pK/BrTKlrUA4cMTsAuoxPJba5Sn6QRi+wJpwxwUr6AuDDkdvxuqFD0LP0RdJGN0KaNoSo6naBNAsKbwgdzwr64T3FjShp38Z2zqObp79iDaE9liIkQcsSUHs8c7qCUfMd0NQOk5mq5q4j/3SkBBf1Vlbe0l7VsULdgPxl6wVXlnL53popdrDZHGKv2k7y46o5JmPjxxIqHGTT3+M6GmGqBgTQf5tj9754uJeMkACaZnYBaefOBdGyUng7al5o6Xjuril2xxmHm8yjwzauztc81HDG71YQwudAU3cK6JhHAYDs8sMqPDsKhQKj0h+ZsRyBgHB++c3ci2V3edMit4=
