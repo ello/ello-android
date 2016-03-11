@@ -24,7 +24,6 @@ public class NoInternetActivity extends ActionBarActivity {
                 } else {
                     Intent intent = new Intent(NoInternetActivity.this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.putExtra("shouldReload", true);
                     startActivity(intent);
                 }
             }
