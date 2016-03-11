@@ -1,5 +1,6 @@
 package ello.co.ello;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -16,7 +17,15 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setupWebView();
+        if (savedInstanceState == null) {
+            displayScreenContent();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        displayScreenContent();
     }
 
     @Override
@@ -48,6 +57,19 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void displayScreenContent() {
+        if(ElloUtil.isNetworkConnected(this)) {
+            setupWebView();
+        } else {
+            setupNoInternetView();
+        }
+    }
+
+    private void setupNoInternetView() {
+        Intent intent = new Intent(this, NoInternetActivity.class);
+        startActivity(intent);
     }
 
     private void setupWebView() {

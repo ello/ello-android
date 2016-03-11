@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".NoInternetActivity"
+    android:background="@color/white">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="190dp"
+        android:layout_height="260dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical"
+        android:padding="0dp"
+        tools:context=".NoInternetActivity">
+        <ImageView
+            android:layout_marginBottom="80dp"
+            android:layout_width="122dp"
+            android:layout_height="122dp"
+            android:padding="0dp"
+            android:id="@+id/imageView"
+            android:layout_gravity="center"
+            android:src="@mipmap/ello_logo"
+            android:paddingLeft="@dimen/nav_bar_button_padding"
+            android:contentDescription="@string/ello_logo" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="22dp"
+            android:gravity="left"
+            android:textSize="8pt"
+            android:textColor="@color/black"
+            android:text="@string/couldnt_connect_error"/>
+        <Button
+            android:id="@+id/refreshButton"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_gravity="left"
+            android:textSize="8pt"
+            android:textAllCaps="false"
+            android:gravity="left|center_vertical"
+            android:background="@drawable/button_background"
+            android:contentDescription="@string/refresh"
+            android:text="@string/refresh"
+            android:textColor="@color/greyC"
+            style="?android:attr/borderlessButtonStyle"/>
+
+    </LinearLayout>
+</RelativeLayout>
+
