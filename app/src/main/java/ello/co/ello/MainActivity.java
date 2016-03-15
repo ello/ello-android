@@ -25,7 +25,9 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        displayScreenContent();
+        if(!ElloUtil.isNetworkConnected(this) || mWebView == null) {
+            displayScreenContent();
+        }
     }
 
     @Override
