@@ -19,8 +19,8 @@ public class NoInternetActivity extends ActionBarActivity {
         Button buttonRefresh = (Button) findViewById(R.id.refreshButton);
         buttonRefresh.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if(!ElloUtil.isNetworkConnected(NoInternetActivity.this)) {
-                    ElloUtil.showErrorNoInternet(NoInternetActivity.this);
+                if(!Reachability.isNetworkConnected(NoInternetActivity.this)) {
+                    Alert.showErrorNoInternet(NoInternetActivity.this);
                 } else {
                     Intent intent = new Intent(NoInternetActivity.this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

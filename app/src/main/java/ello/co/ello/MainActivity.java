@@ -25,7 +25,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(!ElloUtil.isNetworkConnected(this) || mWebView == null) {
+        if(!Reachability.isNetworkConnected(this) || mWebView == null) {
             displayScreenContent();
         }
     }
@@ -62,7 +62,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void displayScreenContent() {
-        if(ElloUtil.isNetworkConnected(this)) {
+        if(Reachability.isNetworkConnected(this)) {
             setupWebView();
         } else {
             setupNoInternetView();
