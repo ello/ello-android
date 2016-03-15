@@ -1,15 +1,17 @@
-<FrameLayout
+<android.support.v4.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
+    android:backgroundTint="@color/white"
     tools:ignore="MergeRootFrame">
 
     <WebView
         android:id="@+id/activity_main_webview"
+        android:backgroundTint="@color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</FrameLayout>
+</android.support.v4.widget.SwipeRefreshLayout>
