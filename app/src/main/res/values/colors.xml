@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="grey231F20">#231F20</color>
+    <color name="grey3">#333333</color>
+    <color name="grey4D">#4D4D4D</color>
+    <color name="grey5">#555555</color>
+    <color name="grey6">#666666</color>
+    <color name="greyA">#AAAAAA</color>
+    <color name="greyC">#CCCCCC</color>
+    <color name="greyE5">#E5E5E5</color>
+    <color name="greyF1">#F1F1F1</color>
+    <color name="greyF2">#F2F2F2</color>
+    <color name="yellowFFFFCC">#FFFFCC</color>
+    <color name="redFFCCCC">#FFCCCC</color>
 </resources>

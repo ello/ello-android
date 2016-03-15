@@ -2,4 +2,9 @@
     <string name="app_name">Ello</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="refresh"><u>Try Again</u></string>
+    <string name="ello_logo">Ello Logo</string>
+    <string name="error">Error</string>
+    <string name="couldnt_connect_error">No Internet Connection</string>
+    <string name="title_activity_no_internets">NoInternetsActivity</string>
 </resources>
