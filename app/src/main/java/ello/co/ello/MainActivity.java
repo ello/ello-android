@@ -2,6 +2,7 @@ package ello.co.ello;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -9,17 +10,25 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener{
 
     private WebView mWebView;
+    private SwipeRefreshLayout mSwipeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.container);
+        mSwipeLayout.setOnRefreshListener(this);
         if (savedInstanceState == null) {
             displayScreenContent();
         }
+    }
+
+    @Override public void onRefresh() {
+        mWebView.reload();
+        mSwipeLayout.setRefreshing(false);
     }
 
     @Override
