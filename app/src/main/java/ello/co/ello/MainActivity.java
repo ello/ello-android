@@ -28,7 +28,10 @@ public class MainActivity
     }
 
     @Override public void onRefresh() {
-        if(mWebView != null) {
+        if(!Reachability.isNetworkConnected(this)) {
+            displayScreenContent();
+        }
+        else if(mWebView != null) {
             mWebView.reload();
         }
         mSwipeLayout.setRefreshing(false);
