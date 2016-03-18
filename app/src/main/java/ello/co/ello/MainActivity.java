@@ -87,7 +87,7 @@ public class MainActivity
         mWebView = (AdvancedWebView) findViewById(R.id.activity_main_webview);
         mWebView.setAlpha(0.0f);
         mWebView.setListener(this, this);
-        mWebView.loadUrl("https://ello-webapp-epic.herokuapp.com");
+        mWebView.loadUrl("https://preview.ello.co");
         mWebView.setWebViewClient(new ElloWebViewClient(this));
     }
 
