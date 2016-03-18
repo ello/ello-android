@@ -2,6 +2,7 @@ package ello.co.ello;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -15,6 +16,7 @@ public class MainActivity
 
     private AdvancedWebView mWebView;
     private SwipeRefreshLayout mSwipeLayout;
+    private String path = "https://preview.ello.co";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +27,7 @@ public class MainActivity
         if (savedInstanceState == null) {
             displayScreenContent();
         }
+        deepLinkWhenPresent();
     }
 
     @Override public void onRefresh() {
@@ -43,6 +46,7 @@ public class MainActivity
         if(!Reachability.isNetworkConnected(this) || mWebView == null) {
             displayScreenContent();
         }
+        deepLinkWhenPresent();
     }
 
     @Override
@@ -70,6 +74,18 @@ public class MainActivity
         }
     }
 
+    private void deepLinkWhenPresent(){
+        Intent intent = getIntent();
+        Uri data = intent.getData();
+
+        if (data != null) {
+            path = data.toString();
+            if (mWebView != null) {
+                mWebView.loadUrl(path);
+            }
+        }
+    }
+
     private void displayScreenContent() {
         if(Reachability.isNetworkConnected(this)) {
             setupWebView();
@@ -87,7 +103,7 @@ public class MainActivity
         mWebView = (AdvancedWebView) findViewById(R.id.activity_main_webview);
         mWebView.setAlpha(0.0f);
         mWebView.setListener(this, this);
-        mWebView.loadUrl("https://preview.ello.co");
+        mWebView.loadUrl(path);
         mWebView.setWebViewClient(new ElloWebViewClient(this));
     }
 
