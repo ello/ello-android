@@ -1,18 +1,19 @@
 package ello.co.ello;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 
+import im.delight.android.webview.AdvancedWebView;
 
-public class MainActivity extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener{
+public class MainActivity
+        extends ActionBarActivity
+        implements SwipeRefreshLayout.OnRefreshListener, AdvancedWebView.Listener
+{
 
-    private WebView mWebView;
+    private AdvancedWebView mWebView;
     private SwipeRefreshLayout mSwipeLayout;
 
     @Override
@@ -27,16 +28,37 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
     }
 
     @Override public void onRefresh() {
-        mWebView.reload();
+        if(mWebView != null) {
+            mWebView.reload();
+        }
         mSwipeLayout.setRefreshing(false);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (mWebView != null) {
+            mWebView.onResume();
+        }
         if(!Reachability.isNetworkConnected(this) || mWebView == null) {
             displayScreenContent();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        if (mWebView != null) {
+            mWebView.onPause();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mWebView != null) {
+            mWebView.onDestroy();
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -46,28 +68,6 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void displayScreenContent() {
@@ -84,17 +84,45 @@ public class MainActivity extends ActionBarActivity implements SwipeRefreshLayou
     }
 
     private void setupWebView() {
-        mWebView = (WebView) findViewById(R.id.activity_main_webview);
+        mWebView = (AdvancedWebView) findViewById(R.id.activity_main_webview);
         mWebView.setAlpha(0.0f);
-
-        // Enable Javascript
-        WebSettings webSettings = mWebView.getSettings();
-
-        webSettings.setJavaScriptEnabled(true);
-
+        mWebView.setListener(this, this);
         mWebView.loadUrl("https://ello-webapp-epic.herokuapp.com");
+        mWebView.setWebViewClient(new ElloWebViewClient(this));
+    }
 
-        // Force links and redirects to open in the WebView instead of in a browser
-        mWebView.setWebViewClient(new ElloWebViewClient(mWebView, this));
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (mWebView != null) {
+            mWebView.onActivityResult(requestCode, resultCode, intent);
+        }
+    }
+
+    // AdvancedWebView.Listener interface functions
+
+    @Override
+    public void onPageStarted(String url, Bitmap favicon) {
+
+    }
+
+    @Override
+    public void onPageFinished(String url) {
+        mWebView.setAlpha(1.0f);
+    }
+
+    @Override
+    public void onPageError(int errorCode, String description, String failingUrl) {
+
+    }
+
+    @Override
+    public void onDownloadRequested(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+
+    }
+
+    @Override
+    public void onExternalPageRequest(String url) {
+
     }
 }

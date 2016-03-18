@@ -11,10 +11,6 @@ import org.robolectric.annotation.Config;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
-/**
- * Created by Sean on 2/29/16.
- */
-
 @Config(constants = BuildConfig.class, sdk = Build.VERSION_CODES.LOLLIPOP)
 @RunWith(RobolectricGradleTestRunner.class)
 public class ElloURITest {

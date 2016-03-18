@@ -99,6 +99,7 @@
     <orderEntry type="library" exported="" scope="TEST" name="shadows-core-3.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="asm-util-5.0.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="bcprov-jdk16-1.46" level="project" />
+    <orderEntry type="library" exported="" name="Android-AdvancedWebView" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="icu4j-53.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="robolectric-resources-3.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="robolectric-annotations-3.0" level="project" />

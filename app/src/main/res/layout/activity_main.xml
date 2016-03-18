@@ -8,7 +8,7 @@
     android:backgroundTint="@color/white"
     tools:ignore="MergeRootFrame">
 
-    <WebView
+    <im.delight.android.webview.AdvancedWebView
         android:id="@+id/activity_main_webview"
         android:backgroundTint="@color/white"
         android:layout_width="match_parent"
