@@ -1,4 +1,4 @@
-<img src="http://d324imu86q1bqn.cloudfront.net/uploads/user/avatar/641/large_Ello.1000x1000.png" width="200px" height="200px" />
+![Ello + Android = Love](https://cloud.githubusercontent.com/assets/12459/13925727/0dc96a7a-ef4f-11e5-9fb0-b23a73551e7f.jpg)
 
 # Ello Android
 Ello's open source Android app
