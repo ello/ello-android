@@ -25,8 +25,15 @@ public class NoInternetActivity extends ActionBarActivity {
                     Intent intent = new Intent(NoInternetActivity.this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
+                    finish();
                 }
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
     }
 }
