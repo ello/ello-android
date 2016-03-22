@@ -100,6 +100,7 @@ public class MainActivity
     private void setupNoInternetView() {
         Intent intent = new Intent(this, NoInternetActivity.class);
         startActivity(intent);
+        finish();
     }
 
     private void setupWebView() {
@@ -144,4 +145,5 @@ public class MainActivity
     public void onExternalPageRequest(String url) {
 
     }
+
 }
