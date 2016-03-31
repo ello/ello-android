@@ -33,5 +33,4 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.0'
     compile 'com.android.support:support-v4:21.0.3'
     compile 'org.xwalk:xwalk_core_library_canary:19.48.503.0'
-    compile files('libs/Android-AdvancedWebView.jar')
 }
