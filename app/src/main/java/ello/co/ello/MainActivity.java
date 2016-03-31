@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
@@ -126,7 +127,9 @@ public class MainActivity
         mWebView.setAlpha(0.0f);
         mWebView.getSettings().setUserAgentString(userAgentString());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            XWalkPreferences.setValue(XWalkPreferences.REMOTE_DEBUGGING, true);
+            if (0 != (getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE)){
+                XWalkPreferences.setValue(XWalkPreferences.REMOTE_DEBUGGING, true);
+            }
         }
     }
 
