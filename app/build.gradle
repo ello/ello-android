@@ -1,5 +1,8 @@
 apply plugin: 'com.android.application'
 
+repositories {
+    mavenLocal()
+}
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
@@ -8,7 +11,7 @@ android {
         applicationId "ello.co.ello"
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 1
+        versionCode 4
         versionName "1.0"
     }
     buildTypes {
@@ -27,7 +30,7 @@ dependencies {
     testCompile 'junit:junit:4.10'
     testCompile 'org.assertj:assertj-core:1.7.0'
     testCompile 'org.robolectric:robolectric:3.0'
-    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.android.support:appcompat-v7:21.0.0'
     compile 'com.android.support:support-v4:21.0.3'
-    compile files('libs/Android-AdvancedWebView.jar')
+    compile 'org.xwalk:xwalk_core_library_canary:19.48.503.0'
 }
