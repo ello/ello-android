@@ -37,9 +37,7 @@ public class MainActivity
         mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.container);
         mSwipeLayout.setOnRefreshListener(this);
         setupWebView();
-        if (savedInstanceState == null) {
-            displayScreenContent();
-        }
+        displayScreenContent();
         deepLinkWhenPresent();
     }
 
