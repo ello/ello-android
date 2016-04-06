@@ -24,11 +24,11 @@ public class ElloURITest {
 
     @Test
     public void testShouldLoadInAppSucceeds() {
-        assertTrue("https://co.ello.ello.co should load in app", ElloURI.shouldLoadInApp("https://co.ello.ello.co"));
-        assertTrue("https://co.ello.ello-webapp-epic.herokuapp.com should load in app", ElloURI.shouldLoadInApp("https://co.ello.ello-webapp-epic.herokuapp.com"));
-        assertTrue("https://co.ello.ello-webapp-rainbow.herokuapp.com should load in app", ElloURI.shouldLoadInApp("https://co.ello.ello-webapp-rainbow.herokuapp.com"));
-        assertTrue("https://co.ello.ello.co/sean should load in app", ElloURI.shouldLoadInApp("https://co.ello.ello.co/sean"));
-        assertTrue("https://preview.co.ello.ello.co should load in app", ElloURI.shouldLoadInApp("https://preview.co.ello.ello.co"));
+        assertTrue("https://ello.co should load in app", ElloURI.shouldLoadInApp("https://ello.co"));
+        assertTrue("https://ello-webapp-epic.herokuapp.com should load in app", ElloURI.shouldLoadInApp("https://ello-webapp-epic.herokuapp.com"));
+        assertTrue("https://ello-webapp-rainbow.herokuapp.com should load in app", ElloURI.shouldLoadInApp("https://ello-webapp-rainbow.herokuapp.com"));
+        assertTrue("https://ello.co/sean should load in app", ElloURI.shouldLoadInApp("https://ello.co/sean"));
+        assertTrue("https://preview.ello.co should load in app", ElloURI.shouldLoadInApp("https://preview.ello.co"));
         assertTrue("/sean should load in app", ElloURI.shouldLoadInApp("/sean"));
     }
 
