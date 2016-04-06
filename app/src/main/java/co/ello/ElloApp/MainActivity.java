@@ -33,8 +33,8 @@ public class MainActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(co.ello.ElloApp.R.layout.activity_main);
-        mSwipeLayout = (SwipeRefreshLayout) findViewById(co.ello.ElloApp.R.id.container);
+        setContentView(R.layout.activity_main);
+        mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.container);
         mSwipeLayout.setOnRefreshListener(this);
         setupWebView();
         displayScreenContent();
@@ -120,7 +120,7 @@ public class MainActivity
     }
 
     private void setupWebView() {
-        mWebView = (XWalkView) findViewById(co.ello.ElloApp.R.id.activity_main_webview);
+        mWebView = (XWalkView) findViewById(R.id.activity_main_webview);
         mWebView.setResourceClient(new ElloResourceClient(mWebView));
         mWebView.setAlpha(0.0f);
         mWebView.getSettings().setUserAgentString(userAgentString());
@@ -152,7 +152,7 @@ public class MainActivity
         } catch (WindowManager.BadTokenException e) {}
         dialog.setCancelable(false);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        dialog.setContentView(co.ello.ElloApp.R.layout.progress_dialog);
+        dialog.setContentView(R.layout.progress_dialog);
         return dialog;
     }
 

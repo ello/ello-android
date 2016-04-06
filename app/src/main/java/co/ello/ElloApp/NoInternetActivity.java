@@ -11,12 +11,12 @@ public class NoInternetActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(co.ello.ElloApp.R.layout.activity_no_internet);
+        setContentView(R.layout.activity_no_internet);
         setupRefreshButton();
     }
 
     protected void setupRefreshButton() {
-        Button buttonRefresh = (Button) findViewById(co.ello.ElloApp.R.id.refreshButton);
+        Button buttonRefresh = (Button) findViewById(R.id.refreshButton);
         buttonRefresh.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if(!Reachability.isNetworkConnected(NoInternetActivity.this)) {
