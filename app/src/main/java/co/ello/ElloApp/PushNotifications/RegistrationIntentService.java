@@ -16,7 +16,6 @@ import co.ello.ElloApp.R;
 public class RegistrationIntentService extends IntentService {
 
     private static final String TAG = RegistrationIntentService.class.getSimpleName();
-    public boolean run = false;
 
     public RegistrationIntentService() {
         super(TAG);
@@ -40,7 +39,6 @@ public class RegistrationIntentService extends IntentService {
 
         Intent registrationComplete = new Intent(ElloPreferences.REGISTRATION_COMPLETE);
         LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
-        run = true;
     }
 
 }
