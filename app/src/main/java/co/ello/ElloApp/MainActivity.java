@@ -20,6 +20,7 @@ import android.view.WindowManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import org.xwalk.core.XWalkActivity;
 import org.xwalk.core.XWalkPreferences;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkView;
@@ -28,7 +29,7 @@ import co.ello.ElloApp.PushNotifications.ElloGcmRegisteredReceiver;
 import co.ello.ElloApp.PushNotifications.RegistrationIntentService;
 
 public class MainActivity
-        extends ActionBarActivity
+        extends XWalkActivity
         implements SwipeRefreshLayout.OnRefreshListener
 {
     private final static String TAG = MainActivity.class.getSimpleName();
@@ -42,7 +43,9 @@ public class MainActivity
     public String path = "https://ello-fg-stage1.herokuapp.com";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
-    private ElloGcmRegisteredReceiver mReceiver;
+    protected ElloGcmRegisteredReceiver mReceiver;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +54,19 @@ public class MainActivity
         mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.container);
         mSwipeLayout.setOnRefreshListener(this);
         setupWebView();
+        setupBroadcastReceiver();
+    }
+
+    protected void onXWalkReady() {
+        mWebView.getSettings().setUserAgentString(userAgentString());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (0 != (getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE)){
+                XWalkPreferences.setValue(XWalkPreferences.REMOTE_DEBUGGING, true);
+            }
+        }
+
         displayScreenContent();
         deepLinkWhenPresent();
-        setupBroadcastReceiver();
     }
 
     @Override public void onRefresh() {
@@ -147,12 +160,6 @@ public class MainActivity
         mWebView = (XWalkView) findViewById(R.id.activity_main_webview);
         mWebView.setResourceClient(new ElloResourceClient(mWebView));
         mWebView.setAlpha(0.0f);
-        mWebView.getSettings().setUserAgentString(userAgentString());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (0 != (getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE)){
-                XWalkPreferences.setValue(XWalkPreferences.REMOTE_DEBUGGING, true);
-            }
-        }
     }
 
     private String userAgentString() {
