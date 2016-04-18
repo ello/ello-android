@@ -15,7 +15,7 @@ import co.ello.ElloApp.R;
 
 public class RegistrationIntentService extends IntentService {
 
-    private static final String TAG = "RegIntentService";
+    private static final String TAG = RegistrationIntentService.class.getSimpleName();
     public boolean run = false;
 
     public RegistrationIntentService() {

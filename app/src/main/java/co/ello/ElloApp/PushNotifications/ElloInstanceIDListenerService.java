@@ -6,7 +6,7 @@ import com.google.android.gms.iid.InstanceIDListenerService;
 
 public class ElloInstanceIDListenerService extends InstanceIDListenerService {
 
-    private static final String TAG = "ElloIDListenerService";
+    private static final String TAG = ElloInstanceIDListenerService.class.getSimpleName();
 
     @Override
     public void onTokenRefresh() {

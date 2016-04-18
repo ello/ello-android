@@ -6,7 +6,7 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmListenerService;
 
 public class ElloGcmListenerService extends GcmListenerService {
-    private static final String TAG = "ElloGcmListenerService";
+    private static final String TAG = ElloGcmListenerService.class.getSimpleName();
 
     @Override
     public void onMessageReceived(String from, Bundle data) {

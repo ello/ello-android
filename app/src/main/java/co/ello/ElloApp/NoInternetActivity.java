@@ -8,6 +8,8 @@ import android.widget.Button;
 
 public class NoInternetActivity extends ActionBarActivity {
 
+    private final static String TAG = NoInternetActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
