@@ -6,5 +6,4 @@ import org.xwalk.core.XWalkView;
 
 
 @Implements(value = XWalkView.class, isInAndroidSdk = false)
-public class ShadowXWalkView extends ShadowViewGroup {
-}
+public class ShadowXWalkView extends ShadowViewGroup {}
