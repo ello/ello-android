@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -13,11 +14,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.WindowManager;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import org.xwalk.core.XWalkPreferences;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkView;
+
+import co.ello.ElloApp.PushNotifications.ElloGcmRegisteredReceiver;
+import co.ello.ElloApp.PushNotifications.RegistrationIntentService;
 
 public class MainActivity
         extends ActionBarActivity
@@ -34,6 +42,7 @@ public class MainActivity
     public String path = "https://ello-fg-stage1.herokuapp.com";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
+    private ElloGcmRegisteredReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +53,7 @@ public class MainActivity
         setupWebView();
         displayScreenContent();
         deepLinkWhenPresent();
+        setupBroadcastReceiver();
     }
 
     @Override public void onRefresh() {
@@ -80,6 +90,9 @@ public class MainActivity
     @Override
     protected void onDestroy() {
         mWebView.onDestroy();
+        if (mReceiver != null) {
+            unregisterReceiver(mReceiver);
+        }
         super.onDestroy();
     }
 
@@ -99,6 +112,12 @@ public class MainActivity
     @Override
     protected void onNewIntent(Intent intent) {
         mWebView.onNewIntent(intent);
+    }
+
+    private void setupBroadcastReceiver() {
+        Log.d(TAG, "setupBroadcastReceiver");
+        mReceiver = new ElloGcmRegisteredReceiver(mWebView);
+        registerReceiver(mReceiver, new IntentFilter("co.ello.ElloApp.REGISTER_DEVICE"));
     }
 
     private void deepLinkWhenPresent(){
@@ -161,8 +180,31 @@ public class MainActivity
         return dialog;
     }
 
-    class ElloResourceClient extends XWalkResourceClient {
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
 
+    private void registerForGCM() {
+        Log.d(TAG, "registerForGCM");
+        if (checkPlayServices()) {
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+        }
+    }
+
+    class ElloResourceClient extends XWalkResourceClient {
 
         public ElloResourceClient(XWalkView xwalkView) {
             super(xwalkView);
@@ -187,6 +229,7 @@ public class MainActivity
                 if (progress != null) {
                     progress.dismiss();
                 }
+                registerForGCM();
             }
         }
 
