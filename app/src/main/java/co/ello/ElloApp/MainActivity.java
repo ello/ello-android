@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -26,6 +25,7 @@ import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkView;
 
 import co.ello.ElloApp.PushNotifications.ElloGcmRegisteredReceiver;
+import co.ello.ElloApp.PushNotifications.PushNotificationReceiver;
 import co.ello.ElloApp.PushNotifications.RegistrationIntentService;
 
 public class MainActivity
@@ -43,9 +43,8 @@ public class MainActivity
     public String path = "https://ello-fg-stage1.herokuapp.com";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
-    protected ElloGcmRegisteredReceiver mReceiver;
-
-
+    protected ElloGcmRegisteredReceiver mRegisterDeviceReceiver;
+    protected PushNotificationReceiver mPushReceivedReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +53,8 @@ public class MainActivity
         mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.container);
         mSwipeLayout.setOnRefreshListener(this);
         setupWebView();
-        setupBroadcastReceiver();
+        setupRegisterDeviceReceiver();
+        setupPushReceivedReceiver();
     }
 
     protected void onXWalkReady() {
@@ -103,8 +103,11 @@ public class MainActivity
     @Override
     protected void onDestroy() {
         mWebView.onDestroy();
-        if (mReceiver != null) {
-            unregisterReceiver(mReceiver);
+        if (mRegisterDeviceReceiver != null) {
+            unregisterReceiver(mRegisterDeviceReceiver);
+        }
+        if (mPushReceivedReceiver != null) {
+            unregisterReceiver(mPushReceivedReceiver);
         }
         super.onDestroy();
     }
@@ -127,10 +130,16 @@ public class MainActivity
         mWebView.onNewIntent(intent);
     }
 
-    private void setupBroadcastReceiver() {
-        Log.d(TAG, "setupBroadcastReceiver");
-        mReceiver = new ElloGcmRegisteredReceiver(mWebView);
-        registerReceiver(mReceiver, new IntentFilter(ElloPreferences.REGISTRATION_COMPLETE));
+    private void setupRegisterDeviceReceiver() {
+        Log.d(TAG, "setupRegisterDeviceReceiver");
+        mRegisterDeviceReceiver = new ElloGcmRegisteredReceiver(mWebView);
+        registerReceiver(mRegisterDeviceReceiver, new IntentFilter(ElloPreferences.REGISTRATION_COMPLETE));
+    }
+
+    private void setupPushReceivedReceiver() {
+        Log.d(TAG, "setupPushReceivedReceiver");
+        mPushReceivedReceiver = new PushNotificationReceiver(mWebView);
+        registerReceiver(mPushReceivedReceiver, new IntentFilter(ElloPreferences.PUSH_RECEIVED));
     }
 
     private void deepLinkWhenPresent(){
