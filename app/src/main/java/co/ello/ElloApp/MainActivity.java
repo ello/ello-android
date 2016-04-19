@@ -130,7 +130,7 @@ public class MainActivity
     private void setupBroadcastReceiver() {
         Log.d(TAG, "setupBroadcastReceiver");
         mReceiver = new ElloGcmRegisteredReceiver(mWebView);
-        registerReceiver(mReceiver, new IntentFilter("co.ello.ElloApp.REGISTER_DEVICE"));
+        registerReceiver(mReceiver, new IntentFilter(ElloPreferences.REGISTRATION_COMPLETE));
     }
 
     private void deepLinkWhenPresent(){

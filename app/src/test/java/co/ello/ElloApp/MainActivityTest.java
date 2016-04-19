@@ -18,6 +18,7 @@ import co.ello.ElloApp.PushNotifications.ElloGcmRegisteredReceiver;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 
 @RunWith(RobolectricGradleTestRunner.class)
@@ -59,10 +60,10 @@ public class MainActivityTest {
                         wrapper.broadcastReceiver.getClass().getSimpleName());
         }
 
-        Assert.assertTrue(receiverFound); // will be false if not found
+        assertTrue(receiverFound); // will be false if not found
 
-        Intent intent = new Intent("co.ello.ElloApp.REGISTER_DEVICE");
+        Intent intent = new Intent(ElloPreferences.REGISTRATION_COMPLETE);
         ShadowApplication shadowApplication = ShadowApplication.getInstance();
-        Assert.assertTrue("is registered for REGISTER_DEVICE", shadowApplication.hasReceiverForIntent(intent));
+        assertTrue("is registered for REGISTRATION_COMPLETE", shadowApplication.hasReceiverForIntent(intent));
     }
 }
