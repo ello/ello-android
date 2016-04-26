@@ -1,6 +1,7 @@
 package co.ello.ElloApp;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.Intent;
@@ -24,8 +25,6 @@ import org.xwalk.core.XWalkPreferences;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkView;
 
-import co.ello.ElloApp.PushNotifications.ElloGcmRegisteredReceiver;
-import co.ello.ElloApp.PushNotifications.PushNotificationReceiver;
 import co.ello.ElloApp.PushNotifications.RegistrationIntentService;
 
 public class MainActivity
@@ -43,8 +42,9 @@ public class MainActivity
     public String path = "https://ello-fg-stage1.herokuapp.com";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
-    protected ElloGcmRegisteredReceiver mRegisterDeviceReceiver;
-    protected PushNotificationReceiver mPushReceivedReceiver;
+    protected BroadcastReceiver mRegisterDeviceReceiver;
+    protected BroadcastReceiver mPushReceivedReceiver;
+    private boolean isXWalkReady = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +58,7 @@ public class MainActivity
     }
 
     protected void onXWalkReady() {
+        isXWalkReady = true;
         mWebView.getSettings().setUserAgentString(userAgentString());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             if (0 != (getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE)){
@@ -80,13 +81,15 @@ public class MainActivity
     @Override
     protected void onResume() {
         super.onResume();
-        mWebView.resumeTimers();
-        mWebView.onShow();
+        if(isXWalkReady) {
+            mWebView.resumeTimers();
+            mWebView.onShow();
+        }
 
         if(!Reachability.isNetworkConnected(this) || mWebView == null) {
             displayScreenContent();
         }
-        else if(shouldReload) {
+        else if(shouldReload && isXWalkReady) {
             shouldReload = false;
             mWebView.reload(XWalkView.RELOAD_IGNORE_CACHE);
         }
@@ -132,13 +135,32 @@ public class MainActivity
 
     private void setupRegisterDeviceReceiver() {
         Log.d(TAG, "setupRegisterDeviceReceiver");
-        mRegisterDeviceReceiver = new ElloGcmRegisteredReceiver(mWebView);
+        mRegisterDeviceReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String reg_id = intent.getExtras().getString("GCM_REG_ID");
+                if(reg_id != null) {
+                    Log.d(TAG,reg_id);
+                    mWebView.load("javascript:registerAndroidNotifications(\"" + reg_id + "\")", null);
+                }
+            }
+        };
+
         registerReceiver(mRegisterDeviceReceiver, new IntentFilter(ElloPreferences.REGISTRATION_COMPLETE));
     }
 
     private void setupPushReceivedReceiver() {
         Log.d(TAG, "setupPushReceivedReceiver");
-        mPushReceivedReceiver = new PushNotificationReceiver(mWebView);
+        mPushReceivedReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String page = intent.getExtras().getString("push_notification_page");
+                if(page != null) {
+                    Log.d(TAG, page);
+                    mWebView.load(page, null);
+                }
+            }
+        };
         registerReceiver(mPushReceivedReceiver, new IntentFilter(ElloPreferences.PUSH_RECEIVED));
     }
 
@@ -174,11 +196,11 @@ public class MainActivity
     private String userAgentString() {
         String version = "";
         String versionCode = "";
-        PackageInfo pInfo = null;
+        PackageInfo pInfo;
         try {
             pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             version = pInfo.versionName;
-            versionCode = new Integer(pInfo.versionCode).toString();
+            versionCode = Integer.valueOf(pInfo.versionCode).toString();
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

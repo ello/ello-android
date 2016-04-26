@@ -1,5 +1,6 @@
 package co.ello.ElloApp;
 
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 
 import junit.framework.Assert;
@@ -13,8 +14,6 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowApplication;
 
 import java.util.List;
-
-import co.ello.ElloApp.PushNotifications.ElloGcmRegisteredReceiver;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -52,18 +51,19 @@ public class MainActivityTest {
         List<ShadowApplication.Wrapper> registeredReceivers = ShadowApplication.getInstance().getRegisteredReceivers();
 
         Assert.assertEquals(false, registeredReceivers.isEmpty());
-
-        boolean receiverFound = false;
-        for (ShadowApplication.Wrapper wrapper : registeredReceivers) {
-            if (!receiverFound)
-                receiverFound = ElloGcmRegisteredReceiver.class.getSimpleName().equals(
-                        wrapper.broadcastReceiver.getClass().getSimpleName());
-        }
-
-        assertTrue(receiverFound); // will be false if not found
-
         Intent intent = new Intent(ElloPreferences.REGISTRATION_COMPLETE);
         ShadowApplication shadowApplication = ShadowApplication.getInstance();
         assertTrue("is registered for REGISTRATION_COMPLETE", shadowApplication.hasReceiverForIntent(intent));
+    }
+
+    @Test
+    public void registersReceiverForPushNotifications() throws Exception {
+        List<ShadowApplication.Wrapper> registeredReceivers = ShadowApplication.getInstance().getRegisteredReceivers();
+
+        Assert.assertEquals(false, registeredReceivers.isEmpty());
+
+        Intent intent = new Intent(ElloPreferences.PUSH_RECEIVED);
+        ShadowApplication shadowApplication = ShadowApplication.getInstance();
+        assertTrue("is registered for PUSH_RECEIVED", shadowApplication.hasReceiverForIntent(intent));
     }
 }
