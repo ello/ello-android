@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.preference.PreferenceManager;
 
 import org.junit.After;
 import org.junit.Before;
@@ -18,7 +17,11 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowApplication;
 
+import javax.inject.Inject;
+
 import co.ello.ElloApp.BuildConfig;
+import co.ello.ElloApp.Dagger.TestElloApp;
+import co.ello.ElloApp.Dagger.TestNetComponent;
 import co.ello.ElloApp.ElloPreferences;
 
 import static junit.framework.Assert.assertEquals;
@@ -31,14 +34,17 @@ import static org.mockito.Mockito.when;
 public class RegistrationIntentServiceTest {
 
     private RegistrationIntentServiceMock service;
-    private SharedPreferences sharedPreferences;
+
+    @Inject
+    protected SharedPreferences sharedPreferences;
+
     private Intent serviceIntent;
 
     @Before
     public void setUp() {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(service);
         serviceIntent = new Intent(RuntimeEnvironment.application, RegistrationIntentServiceMock.class);
 
+        ((TestNetComponent)((TestElloApp) RuntimeEnvironment.application).getNetComponent()).inject(this);
         ShadowApplication.getInstance().startService(serviceIntent);
         service = new RegistrationIntentServiceMock();
         service.onCreate();
@@ -48,7 +54,7 @@ public class RegistrationIntentServiceTest {
     public void testTokenReceived() {
         TokenRetriever tokenRetrieverMock = Mockito.mock(TokenRetriever.class);
         when(tokenRetrieverMock.getToken()).thenReturn("123456");
-        service.mTokenRetriever = tokenRetrieverMock;
+        service.tokenRetriever = tokenRetrieverMock;
         service.onHandleIntent(serviceIntent);
 
         Boolean stored = sharedPreferences.getBoolean(ElloPreferences.SENT_TOKEN_TO_SERVER, false);
@@ -60,7 +66,7 @@ public class RegistrationIntentServiceTest {
     public void testTokenNotReceived() {
         TokenRetriever tokenRetrieverMock = Mockito.mock(TokenRetriever.class);
         when(tokenRetrieverMock.getToken()).thenReturn(null);
-        service.mTokenRetriever = tokenRetrieverMock;
+        service.tokenRetriever = tokenRetrieverMock;
         service.onHandleIntent(serviceIntent);
 
         Boolean stored = sharedPreferences.getBoolean(ElloPreferences.SENT_TOKEN_TO_SERVER, true);
@@ -72,7 +78,7 @@ public class RegistrationIntentServiceTest {
     public void testRegistrationCompleteBroadcastReceived() {
         TokenRetriever tokenRetrieverMock = Mockito.mock(TokenRetriever.class);
         when(tokenRetrieverMock.getToken()).thenReturn("123456");
-        service.mTokenRetriever = tokenRetrieverMock;
+        service.tokenRetriever = tokenRetrieverMock;
 
         final String[] tokens = new String[1];
         final BroadcastReceiver receiver = new BroadcastReceiver() {

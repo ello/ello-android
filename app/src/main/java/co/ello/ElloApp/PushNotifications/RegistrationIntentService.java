@@ -3,24 +3,30 @@ package co.ello.ElloApp.PushNotifications;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
+import javax.inject.Inject;
+
+import co.ello.ElloApp.Dagger.ElloApp;
 import co.ello.ElloApp.ElloPreferences;
 
 public class RegistrationIntentService extends IntentService {
 
     private static final String TAG = RegistrationIntentService.class.getSimpleName();
 
-    protected TokenRetriever mTokenRetriever = new TokenRetriever(this);
+    @Inject
+    protected SharedPreferences sharedPreferences;
+
+    protected TokenRetriever tokenRetriever = new TokenRetriever(this);
 
     public RegistrationIntentService() {
         super(TAG);
+        ((ElloApp) getApplication()).getNetComponent().inject(this);
     }
+
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String token = mTokenRetriever.getToken();
+        String token = tokenRetriever.getToken();
 
         Intent registrationComplete = new Intent(ElloPreferences.REGISTRATION_COMPLETE);
         if(token != null) {

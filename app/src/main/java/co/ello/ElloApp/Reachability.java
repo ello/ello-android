@@ -1,16 +1,23 @@
 package co.ello.ElloApp;
 
-import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+
+import javax.inject.Inject;
 
 public class Reachability {
 
     private final static String TAG = Reachability.class.getSimpleName();
+    private final ConnectivityManager manager;
 
-    public static boolean isNetworkConnected( Context context ) {
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    @Inject
+    public Reachability(ConnectivityManager manager) {
+        this.manager = manager;
+    }
+
+    public boolean isNetworkConnected() {
         NetworkInfo info = manager.getActiveNetworkInfo();
-        return (info != null);
+        boolean isConnected = info != null && info.isConnected();
+        return isConnected;
     }
 }

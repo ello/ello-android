@@ -25,6 +25,9 @@ import org.xwalk.core.XWalkPreferences;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkView;
 
+import javax.inject.Inject;
+
+import co.ello.ElloApp.Dagger.ElloApp;
 import co.ello.ElloApp.PushNotifications.RegistrationIntentService;
 
 public class MainActivity
@@ -34,7 +37,7 @@ public class MainActivity
     private final static String TAG = MainActivity.class.getSimpleName();
 
     @Inject
-    protected Reachability reachability;
+    Reachability reachability;
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public XWalkView xWalkView;
@@ -42,16 +45,17 @@ public class MainActivity
     public String path = "https://ello-fg-stage1.herokuapp.com";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
-    protected BroadcastReceiver mRegisterDeviceReceiver;
-    protected BroadcastReceiver mPushReceivedReceiver;
+    protected BroadcastReceiver registerDeviceReceiver;
+    protected BroadcastReceiver pushReceivedReceiver;
     private boolean isXWalkReady = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ((ElloApp) getApplication()).getNetComponent().inject(this);
         setContentView(R.layout.activity_main);
-        mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.container);
-        mSwipeLayout.setOnRefreshListener(this);
+        swipeLayout = (SwipeRefreshLayout) findViewById(R.id.container);
+        swipeLayout.setOnRefreshListener(this);
         setupWebView();
         setupRegisterDeviceReceiver();
         setupPushReceivedReceiver();
@@ -59,7 +63,7 @@ public class MainActivity
 
     protected void onXWalkReady() {
         isXWalkReady = true;
-        mWebView.getSettings().setUserAgentString(userAgentString());
+        xWalkView.getSettings().setUserAgentString(userAgentString());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             if (0 != (getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE)){
                 XWalkPreferences.setValue(XWalkPreferences.REMOTE_DEBUGGING, true);
@@ -71,46 +75,48 @@ public class MainActivity
     }
 
     @Override public void onRefresh() {
-        if(!Reachability.isNetworkConnected(this)) {
+        if(!reachability.isNetworkConnected()) {
             displayScreenContent();
         }
-        mWebView.reload(XWalkView.RELOAD_IGNORE_CACHE);
-        mSwipeLayout.setRefreshing(false);
+        if(isXWalkReady) {
+            xWalkView.reload(XWalkView.RELOAD_IGNORE_CACHE);
+        }
+        swipeLayout.setRefreshing(false);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if(isXWalkReady) {
-            mWebView.resumeTimers();
-            mWebView.onShow();
+            xWalkView.resumeTimers();
+            xWalkView.onShow();
         }
 
-        if(!Reachability.isNetworkConnected(this) || mWebView == null) {
+        if(!reachability.isNetworkConnected() || xWalkView == null) {
             displayScreenContent();
         }
         else if(shouldReload && isXWalkReady) {
             shouldReload = false;
-            mWebView.reload(XWalkView.RELOAD_IGNORE_CACHE);
+            xWalkView.reload(XWalkView.RELOAD_IGNORE_CACHE);
         }
         deepLinkWhenPresent();
     }
 
     @Override
     protected void onPause() {
-        mWebView.pauseTimers();
-        mWebView.onHide();
+        xWalkView.pauseTimers();
+        xWalkView.onHide();
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        mWebView.onDestroy();
-        if (mRegisterDeviceReceiver != null) {
-            unregisterReceiver(mRegisterDeviceReceiver);
+        xWalkView.onDestroy();
+        if (registerDeviceReceiver != null) {
+            unregisterReceiver(registerDeviceReceiver);
         }
-        if (mPushReceivedReceiver != null) {
-            unregisterReceiver(mPushReceivedReceiver);
+        if (pushReceivedReceiver != null) {
+            unregisterReceiver(pushReceivedReceiver);
         }
         super.onDestroy();
     }
@@ -125,43 +131,43 @@ public class MainActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        mWebView.onActivityResult(requestCode, resultCode, intent);
+        xWalkView.onActivityResult(requestCode, resultCode, intent);
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        mWebView.onNewIntent(intent);
+        xWalkView.onNewIntent(intent);
     }
 
     private void setupRegisterDeviceReceiver() {
         Log.d(TAG, "setupRegisterDeviceReceiver");
-        mRegisterDeviceReceiver = new BroadcastReceiver() {
+        registerDeviceReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String reg_id = intent.getExtras().getString("GCM_REG_ID");
                 if(reg_id != null) {
                     Log.d(TAG,reg_id);
-                    mWebView.load("javascript:registerAndroidNotifications(\"" + reg_id + "\")", null);
+                    xWalkView.load("javascript:registerAndroidNotifications(\"" + reg_id + "\")", null);
                 }
             }
         };
 
-        registerReceiver(mRegisterDeviceReceiver, new IntentFilter(ElloPreferences.REGISTRATION_COMPLETE));
+        registerReceiver(registerDeviceReceiver, new IntentFilter(ElloPreferences.REGISTRATION_COMPLETE));
     }
 
     private void setupPushReceivedReceiver() {
         Log.d(TAG, "setupPushReceivedReceiver");
-        mPushReceivedReceiver = new BroadcastReceiver() {
+        pushReceivedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String page = intent.getExtras().getString("push_notification_page");
                 if(page != null) {
                     Log.d(TAG, page);
-                    mWebView.load(page, null);
+                    xWalkView.load(page, null);
                 }
             }
         };
-        registerReceiver(mPushReceivedReceiver, new IntentFilter(ElloPreferences.PUSH_RECEIVED));
+        registerReceiver(pushReceivedReceiver, new IntentFilter(ElloPreferences.PUSH_RECEIVED));
     }
 
     private void deepLinkWhenPresent(){
@@ -169,13 +175,13 @@ public class MainActivity
 
         if (data != null) {
             path = data.toString();
-            mWebView.load(path, null);
+            xWalkView.load(path, null);
         }
     }
 
     private void displayScreenContent() {
-        if(Reachability.isNetworkConnected(this)) {
-            mWebView.load(path, null);
+        if(reachability.isNetworkConnected()) {
+            xWalkView.load(path, null);
         } else {
             setupNoInternetView();
         }
@@ -188,9 +194,9 @@ public class MainActivity
     }
 
     private void setupWebView() {
-        mWebView = (XWalkView) findViewById(R.id.activity_main_webview);
-        mWebView.setResourceClient(new ElloResourceClient(mWebView));
-        mWebView.setAlpha(0.0f);
+        xWalkView = (XWalkView) findViewById(R.id.activity_main_webview);
+        xWalkView.setResourceClient(new ElloResourceClient(xWalkView));
+        xWalkView.setAlpha(0.0f);
     }
 
     private String userAgentString() {
@@ -204,7 +210,7 @@ public class MainActivity
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        return mWebView.getSettings().getUserAgentString() + " Ello Android/" + version + " (" + versionCode + ")";
+        return xWalkView.getSettings().getUserAgentString() + " Ello Android/" + version + " (" + versionCode + ")";
     }
 
     private ProgressDialog createProgressDialog(Context mContext) {
@@ -263,7 +269,7 @@ public class MainActivity
         public void onLoadFinished(XWalkView view, String url) {
             super.onLoadFinished(view, url);
             if(urlWithoutSlash(url).equals(path)) {
-                mWebView.setAlpha(1.0f);
+                xWalkView.setAlpha(1.0f);
                 if (progress != null) {
                     progress.dismiss();
                 }

@@ -1,6 +1,5 @@
 package co.ello.ElloApp;
 
-import android.content.BroadcastReceiver;
 import android.content.Intent;
 
 import junit.framework.Assert;
@@ -43,7 +42,7 @@ public class MainActivityTest {
 
     @Test
     public void hasACrossWalkView() throws Exception {
-        assertNotNull(activity.mWebView);
+        assertNotNull(activity.xWalkView);
     }
 
     @Test

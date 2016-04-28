@@ -13,16 +13,16 @@ public class TokenRetriever {
 
     private static final String TAG = TokenRetriever.class.getSimpleName();
 
-    private Context mContext;
+    private Context context;
 
     public TokenRetriever(Context context) {
-        this.mContext = context;
+        this.context = context;
     }
 
     public String getToken() {
         try {
-            InstanceID instanceID = InstanceID.getInstance(mContext);
-            String token = instanceID.getToken(mContext.getString(R.string.gcm_defaultSenderId), GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+            InstanceID instanceID = InstanceID.getInstance(context);
+            String token = instanceID.getToken(context.getString(R.string.gcm_defaultSenderId), GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             Log.d(TAG, "GCM Registration Token: " + token);
             return token;
         } catch (Exception e) {
