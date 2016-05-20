@@ -30,7 +30,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="preview.ello.co"/>
+                <data android:scheme="https" android:host="ello.co"/>
             </intent-filter>
         </activity>
         <activity

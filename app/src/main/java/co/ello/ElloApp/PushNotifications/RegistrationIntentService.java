@@ -20,7 +20,13 @@ public class RegistrationIntentService extends IntentService {
 
     public RegistrationIntentService() {
         super(TAG);
-        ((ElloApp) getApplication()).getNetComponent().inject(this);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        ElloApp app = (ElloApp) getApplication();
+        app.getNetComponent().inject(this);
     }
 
 

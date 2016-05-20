@@ -37,7 +37,7 @@ public class MainActivity
     private final static String TAG = MainActivity.class.getSimpleName();
 
     @Inject
-    Reachability reachability;
+    protected Reachability reachability;
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public XWalkView xWalkView;
@@ -45,8 +45,8 @@ public class MainActivity
     public String path = "https://ello-fg-stage1.herokuapp.com";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
-    protected BroadcastReceiver registerDeviceReceiver;
-    protected BroadcastReceiver pushReceivedReceiver;
+    private BroadcastReceiver registerDeviceReceiver;
+    private BroadcastReceiver pushReceivedReceiver;
     private boolean isXWalkReady = false;
 
     @Override

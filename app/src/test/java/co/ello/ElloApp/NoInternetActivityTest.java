@@ -2,8 +2,6 @@ package co.ello.ElloApp;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.widget.Button;
 
 import org.junit.Before;
@@ -15,7 +13,6 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlertDialog;
-import org.robolectric.shadows.ShadowNetworkInfo;
 
 import javax.inject.Inject;
 
@@ -61,6 +58,7 @@ public class NoInternetActivityTest {
         ShadowActivity shadowActivity = shadowOf(activity);
         button.performClick();
         Intent startedIntent = shadowActivity.getNextStartedActivity();
+
         assertThat(startedIntent.getComponent().getClassName(),
                 equalTo(MainActivity.class.getName()));
     }
@@ -73,6 +71,7 @@ public class NoInternetActivityTest {
         button.performClick();
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         ShadowAlertDialog sAlert = shadowOf(alert);
+
         assertThat(sAlert.getTitle().toString(),
                 equalTo(activity.getString(R.string.error)));
         assertThat(sAlert.getMessage().toString(),
