@@ -37,7 +37,7 @@ public class MainActivityTest {
 
     @Test
     public void hasCorrectPath() throws Exception {
-        assertEquals("https://preview.ello.co", activity.path);
+        assertEquals("https://ello.co", activity.path);
     }
 
     @Test
