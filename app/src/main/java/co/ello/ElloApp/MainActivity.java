@@ -42,7 +42,7 @@ public class MainActivity
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public XWalkView xWalkView;
     private SwipeRefreshLayout swipeLayout;
-    public String path = "https://ello-fg-stage1.herokuapp.com";
+    public String path = "https://ello.co";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
     private BroadcastReceiver registerDeviceReceiver;
