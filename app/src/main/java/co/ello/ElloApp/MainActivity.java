@@ -31,8 +31,7 @@ public class MainActivity
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public XWalkView xWalkView;
     private SwipeRefreshLayout swipeLayout;
-//    private String path = "http://10.1.10.153:6660";
-    public String path = "https://ello-fg-stage1.herokuapp.com ";
+    public String path = "https://ello-fg-stage1.herokuapp.com";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
 
