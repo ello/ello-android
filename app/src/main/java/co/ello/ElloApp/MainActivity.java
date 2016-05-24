@@ -23,10 +23,15 @@ public class MainActivity
         extends ActionBarActivity
         implements SwipeRefreshLayout.OnRefreshListener
 {
+    private final static String TAG = MainActivity.class.getSimpleName();
 
-    private XWalkView mWebView;
-    private SwipeRefreshLayout mSwipeLayout;
-    private String path = "https://preview.ello.co";
+    @Inject
+    protected Reachability reachability;
+
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    public XWalkView xWalkView;
+    private SwipeRefreshLayout swipeLayout;
+    public String path = "https://ello-fg-stage1.herokuapp.com";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
 
