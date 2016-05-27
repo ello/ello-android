@@ -74,7 +74,8 @@ public class MainActivity
         deepLinkWhenPresent();
     }
 
-    @Override public void onRefresh() {
+    @Override
+    public void onRefresh() {
         if(!reachability.isNetworkConnected()) {
             displayScreenContent();
         }
