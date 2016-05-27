@@ -1,8 +1,13 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 repositories {
     mavenLocal()
+    maven {
+        url 'https://download.01.org/crosswalk/releases/crosswalk/android/maven2'
+    }
 }
+
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
@@ -11,7 +16,7 @@ android {
         applicationId "co.ello.ElloApp"
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 7
+        versionCode 8
         versionName "1.0"
     }
     buildTypes {
@@ -27,10 +32,27 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+
+    apt 'com.google.dagger:dagger-compiler:2.2'
+    compile 'com.google.dagger:dagger:2.2'
+    compile "com.google.android.gms:play-services-gcm:8.4.0"
+    compile 'com.android.support:appcompat-v7:21.0.0'
+    compile 'com.android.support:support-v4:21.0.3'
+    compile 'org.xwalk:xwalk_core_library_beta:19.49.514.2'
+    testApt 'com.google.dagger:dagger-compiler:2.2'
     testCompile 'junit:junit:4.10'
     testCompile 'org.assertj:assertj-core:1.7.0'
     testCompile 'org.robolectric:robolectric:3.0'
-    compile 'com.android.support:appcompat-v7:21.0.0'
-    compile 'com.android.support:support-v4:21.0.3'
-    compile 'org.xwalk:xwalk_core_library_canary:19.48.503.0'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile 'com.google.dagger:dagger:2.2'
+
+    provided 'javax.annotation:jsr250-api:1.0'
 }
+
+// prevent the "superClassName is empty" error for classes not annotated as tests
+tasks.withType(Test) {
+    scanForTestClasses = false
+    include "**/*Test.class" // whatever Ant pattern matches your test class files
+}
+
+apply plugin: 'com.google.gms.google-services'
