@@ -14,8 +14,6 @@ Nothing much to it. Clone and sync gradle and you should be good to go.
 When creating the apk to upload to the Google Play Store it must be aligned.
 `zipalign -f -v 4 app-release-unaligned.apk app-release-aligned.apk`
 
-We are currently using a canary build of [CrossWalk](https://crosswalk-project.org). Canary builds are not available through remote Maven repositories so they must be downloaded `wget https://download.01.org/crosswalk/releases/crosswalk/android/canary/19.48.503.0/crosswalk-19.48.503.0.aar` and installed with Maven locally `mvn install:install-file -DgroupId=org.xwalk -DartifactId=xwalk_core_library_canary       -Dversion=19.48.503.0 -Dpackaging=aar  -Dfile=crosswalk-19.48.503.0.aar       -DgeneratePom=true`
-
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/ello/ello-android.
 
