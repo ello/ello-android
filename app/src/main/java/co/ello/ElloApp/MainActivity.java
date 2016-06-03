@@ -176,6 +176,7 @@ public class MainActivity
 
         if (data != null) {
             path = data.toString();
+            getIntent().setData(null);
             xWalkView.load(path, null);
         }
     }
