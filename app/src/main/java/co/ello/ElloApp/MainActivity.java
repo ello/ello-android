@@ -42,7 +42,7 @@ public class MainActivity
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public XWalkView xWalkView;
     private SwipeRefreshLayout swipeLayout;
-    public String path = "https://ello.co";
+    public String path = "https://ello.ninja";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
     private BroadcastReceiver registerDeviceReceiver;
@@ -146,9 +146,16 @@ public class MainActivity
             @Override
             public void onReceive(Context context, Intent intent) {
                 String reg_id = intent.getExtras().getString("GCM_REG_ID");
+                String registerFunctionCall =
+                        "javascript:registerAndroidNotifications(\"" +
+                                reg_id + "\", \"" +
+                                packageName() + "\", \"" +
+                                versionName() + "\", \"" +
+                                versionCode() + "\")";
+                Log.d(TAG, registerFunctionCall);
                 if(reg_id != null) {
                     Log.d(TAG,reg_id);
-                    xWalkView.load("javascript:registerAndroidNotifications(\"" + reg_id + "\")", null);
+                    xWalkView.load(registerFunctionCall, null);
                 }
             }
         };
@@ -198,21 +205,47 @@ public class MainActivity
     private void setupWebView() {
         xWalkView = (XWalkView) findViewById(R.id.activity_main_webview);
         xWalkView.setResourceClient(new ElloResourceClient(xWalkView));
-        xWalkView.setAlpha(0.0f);
+//        xWalkView.setAlpha(0.0f);
     }
 
-    private String userAgentString() {
-        String version = "";
-        String versionCode = "";
+    private String versionName() {
         PackageInfo pInfo;
+        String versionName = "";
         try {
             pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            version = pInfo.versionName;
+            versionName = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return versionName;
+    }
+
+    private String versionCode() {
+        PackageInfo pInfo;
+        String versionCode = "";
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             versionCode = Integer.valueOf(pInfo.versionCode).toString();
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        return xWalkView.getSettings().getUserAgentString() + " Ello Android/" + version + " (" + versionCode + ")";
+        return versionCode;
+    }
+
+    private String packageName() {
+        PackageInfo pInfo;
+        String packageName = "";
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            packageName = pInfo.packageName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return packageName;
+    }
+
+    private String userAgentString() {
+        return xWalkView.getSettings().getUserAgentString() + " Ello Android/" + versionName() + " (" + versionCode() + ")";
     }
 
     private ProgressDialog createProgressDialog(Context mContext) {
