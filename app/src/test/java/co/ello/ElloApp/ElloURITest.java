@@ -23,6 +23,7 @@ public class ElloURITest {
     @Test
     public void testShouldLoadInAppSucceeds() {
         assertTrue("https://ello.co should load in app", ElloURI.shouldLoadInApp("https://ello.co"));
+        assertTrue("https://ello.ninja should load in app", ElloURI.shouldLoadInApp("https://ello.ninja"));
         assertTrue("https://ello-webapp-epic.herokuapp.com should load in app", ElloURI.shouldLoadInApp("https://ello-webapp-epic.herokuapp.com"));
         assertTrue("https://ello-webapp-rainbow.herokuapp.com should load in app", ElloURI.shouldLoadInApp("https://ello-webapp-rainbow.herokuapp.com"));
         assertTrue("https://ello.co/sean should load in app", ElloURI.shouldLoadInApp("https://ello.co/sean"));
