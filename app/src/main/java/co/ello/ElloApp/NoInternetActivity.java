@@ -20,7 +20,8 @@ public class NoInternetActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((ElloApp) getApplication()).getNetComponent().inject(this);
+        ElloApp app = (ElloApp) getApplication();
+        app.getNetComponent().inject(this);
         setContentView(R.layout.activity_no_internet);
         setupRefreshButton();
 

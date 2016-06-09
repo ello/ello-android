@@ -2,20 +2,21 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
 repositories {
-    mavenLocal()
+    mavenCentral()
     maven {
         url 'https://download.01.org/crosswalk/releases/crosswalk/android/maven2'
     }
 }
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "co.ello.ElloApp"
         minSdkVersion 16
-        targetSdkVersion 21
+        targetSdkVersion 23
         versionCode 8
         versionName "1.0"
     }
@@ -30,22 +31,27 @@ android {
     }
 }
 
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-
-    apt 'com.google.dagger:dagger-compiler:2.2'
-    compile 'com.google.dagger:dagger:2.2'
-    compile "com.google.android.gms:play-services-gcm:8.4.0"
-    compile 'com.android.support:appcompat-v7:21.0.0'
-    compile 'com.android.support:support-v4:21.0.3'
+    apt 'com.google.guava:guava:19.0'
+    apt 'com.google.dagger:dagger-compiler:2.3'
+    compile 'com.google.dagger:dagger:2.3'
+    compile 'com.nispok:snackbar:2.11.+'
+    compile 'com.google.android.gms:play-services-gcm:8.4.0'
+    compile "com.android.support:appcompat-v7:23.3.0"
+    compile "com.android.support:support-v4:23.3.0"
+    compile "com.android.support:design:23.3.0"
     compile 'org.xwalk:xwalk_core_library_beta:19.49.514.2'
-    testApt 'com.google.dagger:dagger-compiler:2.2'
+    testApt 'com.google.guava:guava:19.0'
+    testApt 'com.google.dagger:dagger-compiler:2.3'
     testCompile 'junit:junit:4.10'
     testCompile 'org.assertj:assertj-core:1.7.0'
-    testCompile 'org.robolectric:robolectric:3.0'
-    testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'com.google.dagger:dagger:2.2'
-
+    testCompile 'org.robolectric:robolectric:3.1'
+    testCompile 'org.robolectric:shadows-support-v4:3.0'
+    testCompile 'org.mockito:mockito-core:2.0.54-beta'
+    testCompile 'com.google.dagger:dagger:2.3'
+    testCompile 'org.khronos:opengl-api:gl1.1-android-2.1_r1' // required for robolectric 3.1 to work
     provided 'javax.annotation:jsr250-api:1.0'
 }
 

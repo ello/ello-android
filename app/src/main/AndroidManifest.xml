@@ -44,7 +44,7 @@
         <activity
             android:name=".NoInternetActivity"
             android:label="@string/title_activity_no_internets"
-            android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
+            android:theme="@style/Theme.AppCompat.NoActionBar"/>
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"

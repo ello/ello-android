@@ -20,6 +20,13 @@ import android.view.WindowManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+// Using a 3rd party Snackbar because we can't extend
+// AppCompatActivity, thanks a lot XWalkActivity
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+import com.nispok.snackbar.enums.SnackbarType;
+import com.nispok.snackbar.listeners.ActionClickListener;
+
 import org.xwalk.core.XWalkActivity;
 import org.xwalk.core.XWalkPreferences;
 import org.xwalk.core.XWalkResourceClient;
@@ -29,6 +36,7 @@ import javax.inject.Inject;
 
 import co.ello.ElloApp.Dagger.ElloApp;
 import co.ello.ElloApp.PushNotifications.RegistrationIntentService;
+
 
 public class MainActivity
         extends XWalkActivity
@@ -40,9 +48,10 @@ public class MainActivity
     protected Reachability reachability;
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    public static Boolean inBackground = true;
     public XWalkView xWalkView;
     private SwipeRefreshLayout swipeLayout;
-    public String path = "https://ello.ninja";
+    public String path = "https://ello.co";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
     private BroadcastReceiver registerDeviceReceiver;
@@ -56,6 +65,7 @@ public class MainActivity
         setContentView(R.layout.activity_main);
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.container);
         swipeLayout.setOnRefreshListener(this);
+
         setupWebView();
         setupRegisterDeviceReceiver();
         setupPushReceivedReceiver();
@@ -86,8 +96,15 @@ public class MainActivity
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        inBackground = true;
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+        inBackground = false;
         if(isXWalkReady) {
             xWalkView.resumeTimers();
             xWalkView.onShow();
@@ -105,8 +122,10 @@ public class MainActivity
 
     @Override
     protected void onPause() {
-        xWalkView.pauseTimers();
-        xWalkView.onHide();
+        if (isXWalkReady) {
+            xWalkView.pauseTimers();
+            xWalkView.onHide();
+        }
         super.onPause();
     }
 
@@ -164,24 +183,44 @@ public class MainActivity
     }
 
     private void setupPushReceivedReceiver() {
-        Log.d(TAG, "setupPushReceivedReceiver");
         pushReceivedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String page = intent.getExtras().getString("push_notification_page");
-                if(page != null) {
-                    Log.d(TAG, page);
-                    xWalkView.load(page, null);
+                String title = intent.getExtras().getString("title");
+                String body = intent.getExtras().getString("body");
+                final String webUrl = intent.getExtras().getString("web_url");
+
+                if (title != null && body != null && webUrl != null ) {
+                    // Using a 3rd party Snackbar because we can't extend
+                    // AppCompatActivity, thanks a lot XWalkActivity
+                    Snackbar snackbar = Snackbar.with(context)
+                            .type(SnackbarType.MULTI_LINE)
+                            .text(title + " " + body)
+                            .actionLabel(R.string.view)
+                            .actionListener(new ActionClickListener() {
+                                @Override
+                                public void onActionClicked(Snackbar snackbar) {
+                                    MainActivity.this.xWalkView.load(webUrl, null);
+                                }
+                            });
+                    SnackbarManager.show(snackbar);
                 }
             }
         };
         registerReceiver(pushReceivedReceiver, new IntentFilter(ElloPreferences.PUSH_RECEIVED));
     }
 
+
+
     private void deepLinkWhenPresent(){
         Uri data = getIntent().getData();
 
-        if (data != null) {
+        Intent get = getIntent();
+        String webUrl = get.getStringExtra("web_url");
+        if (webUrl != null) {
+            path = webUrl;
+            xWalkView.load(path, null);
+        } else if (data != null) {
             path = data.toString();
             getIntent().setData(null);
             xWalkView.load(path, null);
@@ -205,7 +244,7 @@ public class MainActivity
     private void setupWebView() {
         xWalkView = (XWalkView) findViewById(R.id.activity_main_webview);
         xWalkView.setResourceClient(new ElloResourceClient(xWalkView));
-//        xWalkView.setAlpha(0.0f);
+        xWalkView.setAlpha(0.0f);
     }
 
     private String versionName() {

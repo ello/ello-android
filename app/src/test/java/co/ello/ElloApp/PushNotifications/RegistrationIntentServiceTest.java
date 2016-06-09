@@ -12,10 +12,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowApplication;
+import org.robolectric.util.ServiceController;
 
 import javax.inject.Inject;
 
@@ -33,7 +35,7 @@ import static org.mockito.Mockito.when;
 @RunWith(RobolectricGradleTestRunner.class)
 public class RegistrationIntentServiceTest {
 
-    private RegistrationIntentServiceMock service;
+    private RegistrationIntentService service;
 
     @Inject
     protected SharedPreferences sharedPreferences;
@@ -42,12 +44,16 @@ public class RegistrationIntentServiceTest {
 
     @Before
     public void setUp() {
-        serviceIntent = new Intent(RuntimeEnvironment.application, RegistrationIntentServiceMock.class);
+        serviceIntent = new Intent(RuntimeEnvironment.application, RegistrationIntentService.class);
 
         ((TestNetComponent)((TestElloApp) RuntimeEnvironment.application).getNetComponent()).inject(this);
         ShadowApplication.getInstance().startService(serviceIntent);
-        service = new RegistrationIntentServiceMock();
-        service.onCreate();
+
+        ServiceController<RegistrationIntentService> serviceController = Robolectric.buildService(RegistrationIntentService.class);
+        serviceController.attach()
+                .create()
+                .startCommand(0, 1);
+        service = serviceController.get();
     }
     
     @Test
@@ -97,11 +103,4 @@ public class RegistrationIntentServiceTest {
     @After
     public void tearDown() {}
 
-    // simple mock to expose onHandleIntent() for testing
-    class RegistrationIntentServiceMock extends RegistrationIntentService {
-        @Override
-        public void onHandleIntent(Intent intent) {
-            super.onHandleIntent(intent);
-        }
-    }
 }
