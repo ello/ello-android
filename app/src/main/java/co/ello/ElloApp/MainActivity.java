@@ -160,7 +160,6 @@ public class MainActivity
     }
 
     private void setupRegisterDeviceReceiver() {
-        Log.d(TAG, "setupRegisterDeviceReceiver");
         registerDeviceReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -171,9 +170,7 @@ public class MainActivity
                                 packageName() + "\", \"" +
                                 versionName() + "\", \"" +
                                 versionCode() + "\")";
-                Log.d(TAG, registerFunctionCall);
                 if(reg_id != null) {
-                    Log.d(TAG,reg_id);
                     xWalkView.load(registerFunctionCall, null);
                 }
             }
@@ -315,7 +312,6 @@ public class MainActivity
     }
 
     private void registerForGCM() {
-        Log.d(TAG, "registerForGCM");
         if (checkPlayServices()) {
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
