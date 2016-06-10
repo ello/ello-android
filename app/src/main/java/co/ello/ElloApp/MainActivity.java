@@ -27,6 +27,7 @@ import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.nispok.snackbar.listeners.ActionClickListener;
 
+import org.xwalk.core.JavascriptInterface;
 import org.xwalk.core.XWalkActivity;
 import org.xwalk.core.XWalkPreferences;
 import org.xwalk.core.XWalkResourceClient;
@@ -80,6 +81,7 @@ public class MainActivity
             }
         }
 
+        xWalkView.addJavascriptInterface(this, "AndroidInterface");
         displayScreenContent();
         deepLinkWhenPresent();
     }
@@ -159,6 +161,15 @@ public class MainActivity
         xWalkView.onNewIntent(intent);
     }
 
+    @JavascriptInterface
+    public void webAppLoaded() {
+        xWalkView.setAlpha(1.0f);
+        if (progress != null) {
+            progress.dismiss();
+        }
+        registerForGCM();
+    }
+
     private void setupRegisterDeviceReceiver() {
         registerDeviceReceiver = new BroadcastReceiver() {
             @Override
@@ -210,6 +221,11 @@ public class MainActivity
 
 
     private void deepLinkWhenPresent(){
+        if (progress == null) {
+            progress = createProgressDialog(MainActivity.this);
+        }
+        progress.show();
+
         Uri data = getIntent().getData();
 
         Intent get = getIntent();
@@ -322,29 +338,6 @@ public class MainActivity
 
         public ElloResourceClient(XWalkView xwalkView) {
             super(xwalkView);
-        }
-
-        @Override
-        public void onLoadStarted(XWalkView view, String url) {
-            super.onLoadStarted(view, url);
-            if(urlWithoutSlash(url).equals(path)) {
-                if (progress == null) {
-                    progress = createProgressDialog(MainActivity.this);
-                }
-                progress.show();
-            }
-        }
-
-        @Override
-        public void onLoadFinished(XWalkView view, String url) {
-            super.onLoadFinished(view, url);
-            if(urlWithoutSlash(url).equals(path)) {
-                xWalkView.setAlpha(1.0f);
-                if (progress != null) {
-                    progress.dismiss();
-                }
-                registerForGCM();
-            }
         }
 
         @Override
