@@ -20,6 +20,13 @@ import android.view.WindowManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+// Using a 3rd party Snackbar because we can't extend
+// AppCompatActivity, thanks a lot XWalkActivity
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+import com.nispok.snackbar.enums.SnackbarType;
+import com.nispok.snackbar.listeners.ActionClickListener;
+
 import org.xwalk.core.XWalkActivity;
 import org.xwalk.core.XWalkPreferences;
 import org.xwalk.core.XWalkResourceClient;
@@ -29,6 +36,7 @@ import javax.inject.Inject;
 
 import co.ello.ElloApp.Dagger.ElloApp;
 import co.ello.ElloApp.PushNotifications.RegistrationIntentService;
+
 
 public class MainActivity
         extends XWalkActivity
@@ -40,6 +48,7 @@ public class MainActivity
     protected Reachability reachability;
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    public static Boolean inBackground = true;
     public XWalkView xWalkView;
     private SwipeRefreshLayout swipeLayout;
     public String path = "https://ello.co";
@@ -56,6 +65,7 @@ public class MainActivity
         setContentView(R.layout.activity_main);
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.container);
         swipeLayout.setOnRefreshListener(this);
+
         setupWebView();
         setupRegisterDeviceReceiver();
         setupPushReceivedReceiver();
@@ -86,8 +96,15 @@ public class MainActivity
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        inBackground = true;
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+        inBackground = false;
         if(isXWalkReady) {
             xWalkView.resumeTimers();
             xWalkView.onShow();
@@ -105,8 +122,10 @@ public class MainActivity
 
     @Override
     protected void onPause() {
-        xWalkView.pauseTimers();
-        xWalkView.onHide();
+        if (isXWalkReady) {
+            xWalkView.pauseTimers();
+            xWalkView.onHide();
+        }
         super.onPause();
     }
 
@@ -141,14 +160,18 @@ public class MainActivity
     }
 
     private void setupRegisterDeviceReceiver() {
-        Log.d(TAG, "setupRegisterDeviceReceiver");
         registerDeviceReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String reg_id = intent.getExtras().getString("GCM_REG_ID");
+                String registerFunctionCall =
+                        "javascript:registerAndroidNotifications(\"" +
+                                reg_id + "\", \"" +
+                                packageName() + "\", \"" +
+                                versionName() + "\", \"" +
+                                versionCode() + "\")";
                 if(reg_id != null) {
-                    Log.d(TAG,reg_id);
-                    xWalkView.load("javascript:registerAndroidNotifications(\"" + reg_id + "\")", null);
+                    xWalkView.load(registerFunctionCall, null);
                 }
             }
         };
@@ -157,24 +180,44 @@ public class MainActivity
     }
 
     private void setupPushReceivedReceiver() {
-        Log.d(TAG, "setupPushReceivedReceiver");
         pushReceivedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String page = intent.getExtras().getString("push_notification_page");
-                if(page != null) {
-                    Log.d(TAG, page);
-                    xWalkView.load(page, null);
+                String title = intent.getExtras().getString("title");
+                String body = intent.getExtras().getString("body");
+                final String webUrl = intent.getExtras().getString("web_url");
+
+                if (title != null && body != null && webUrl != null ) {
+                    // Using a 3rd party Snackbar because we can't extend
+                    // AppCompatActivity, thanks a lot XWalkActivity
+                    Snackbar snackbar = Snackbar.with(context)
+                            .type(SnackbarType.MULTI_LINE)
+                            .text(title + " " + body)
+                            .actionLabel(R.string.view)
+                            .actionListener(new ActionClickListener() {
+                                @Override
+                                public void onActionClicked(Snackbar snackbar) {
+                                    MainActivity.this.xWalkView.load(webUrl, null);
+                                }
+                            });
+                    SnackbarManager.show(snackbar);
                 }
             }
         };
         registerReceiver(pushReceivedReceiver, new IntentFilter(ElloPreferences.PUSH_RECEIVED));
     }
 
+
+
     private void deepLinkWhenPresent(){
         Uri data = getIntent().getData();
 
-        if (data != null) {
+        Intent get = getIntent();
+        String webUrl = get.getStringExtra("web_url");
+        if (webUrl != null) {
+            path = webUrl;
+            xWalkView.load(path, null);
+        } else if (data != null) {
             path = data.toString();
             getIntent().setData(null);
             xWalkView.load(path, null);
@@ -201,18 +244,44 @@ public class MainActivity
         xWalkView.setAlpha(0.0f);
     }
 
-    private String userAgentString() {
-        String version = "";
-        String versionCode = "";
+    private String versionName() {
         PackageInfo pInfo;
+        String versionName = "";
         try {
             pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            version = pInfo.versionName;
+            versionName = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return versionName;
+    }
+
+    private String versionCode() {
+        PackageInfo pInfo;
+        String versionCode = "";
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             versionCode = Integer.valueOf(pInfo.versionCode).toString();
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        return xWalkView.getSettings().getUserAgentString() + " Ello Android/" + version + " (" + versionCode + ")";
+        return versionCode;
+    }
+
+    private String packageName() {
+        PackageInfo pInfo;
+        String packageName = "";
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            packageName = pInfo.packageName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return packageName;
+    }
+
+    private String userAgentString() {
+        return xWalkView.getSettings().getUserAgentString() + " Ello Android/" + versionName() + " (" + versionCode() + ")";
     }
 
     private ProgressDialog createProgressDialog(Context mContext) {
@@ -243,7 +312,6 @@ public class MainActivity
     }
 
     private void registerForGCM() {
-        Log.d(TAG, "registerForGCM");
         if (checkPlayServices()) {
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
