@@ -246,8 +246,7 @@ public class MainActivity
             path = data.toString();
             getIntent().setData(null);
             loadPage(path);
-        }
-        else if (isXWalkReady && isDeepLink) {
+        } else if (isXWalkReady && isDeepLink) {
             isDeepLink = false;
             loadPage(path);
         }
