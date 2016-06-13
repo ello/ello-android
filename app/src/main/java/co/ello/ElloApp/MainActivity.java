@@ -55,6 +55,7 @@ public class MainActivity
     public String path = "https://ello.co";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
+    private Boolean isDeepLink = false;
     private BroadcastReceiver registerDeviceReceiver;
     private BroadcastReceiver pushReceivedReceiver;
     private boolean isXWalkReady = false;
@@ -68,8 +69,10 @@ public class MainActivity
         swipeLayout.setOnRefreshListener(this);
 
         setupWebView();
-        setupRegisterDeviceReceiver();
-        setupPushReceivedReceiver();
+        // don't register the device for the initial release
+        // coming soon to a theatre near you
+//        setupRegisterDeviceReceiver();
+//        setupPushReceivedReceiver();
     }
 
     protected void onXWalkReady() {
@@ -93,6 +96,7 @@ public class MainActivity
         }
         if(isXWalkReady) {
             xWalkView.reload(XWalkView.RELOAD_IGNORE_CACHE);
+            progress.show();
         }
         swipeLayout.setRefreshing(false);
     }
@@ -158,6 +162,12 @@ public class MainActivity
 
     @Override
     protected void onNewIntent(Intent intent) {
+        Uri data = intent.getData();
+        if (data != null) {
+            path = data.toString();
+            isDeepLink = true;
+        }
+
         xWalkView.onNewIntent(intent);
     }
 
@@ -224,25 +234,33 @@ public class MainActivity
         if (progress == null) {
             progress = createProgressDialog(MainActivity.this);
         }
-        progress.show();
 
         Uri data = getIntent().getData();
 
         Intent get = getIntent();
         String webUrl = get.getStringExtra("web_url");
-        if (webUrl != null) {
+        if (isXWalkReady && webUrl != null) {
             path = webUrl;
-            xWalkView.load(path, null);
-        } else if (data != null) {
+            loadPage(path);
+        } else if (isXWalkReady && data != null) {
             path = data.toString();
             getIntent().setData(null);
-            xWalkView.load(path, null);
+            loadPage(path);
         }
+        else if (isXWalkReady && isDeepLink) {
+            isDeepLink = false;
+            loadPage(path);
+        }
+    }
+
+    private void loadPage(String page) {
+        xWalkView.load(page, null);
+        progress.show();
     }
 
     private void displayScreenContent() {
         if(reachability.isNetworkConnected()) {
-            xWalkView.load(path, null);
+            loadPage(path);
         } else {
             setupNoInternetView();
         }
@@ -349,13 +367,6 @@ public class MainActivity
                 MainActivity.this.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
                 return true;
             }
-        }
-
-        private String urlWithoutSlash(String url) {
-            if (url.endsWith("/")) {
-               url = url.substring(0, url.length() - 1);
-            }
-            return url;
         }
     }
 }
