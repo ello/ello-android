@@ -58,7 +58,7 @@ public class MainActivity
     private Boolean isDeepLink = false;
     private BroadcastReceiver registerDeviceReceiver;
     private BroadcastReceiver pushReceivedReceiver;
-    private boolean isXWalkReady = false;
+    private Boolean isXWalkReady = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,11 +173,11 @@ public class MainActivity
 
     @JavascriptInterface
     public void webAppLoaded() {
-        xWalkView.setAlpha(1.0f);
         if (progress != null) {
             progress.dismiss();
         }
-        registerForGCM();
+        // uncomment for GCM when we go live with it !!
+//        registerForGCM();
     }
 
     private void setupRegisterDeviceReceiver() {
@@ -274,7 +274,6 @@ public class MainActivity
     private void setupWebView() {
         xWalkView = (XWalkView) findViewById(R.id.activity_main_webview);
         xWalkView.setResourceClient(new ElloResourceClient(xWalkView));
-        xWalkView.setAlpha(0.0f);
     }
 
     private String versionName() {
