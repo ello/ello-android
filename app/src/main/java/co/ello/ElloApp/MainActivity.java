@@ -69,10 +69,8 @@ public class MainActivity
         swipeLayout.setOnRefreshListener(this);
 
         setupWebView();
-        // don't register the device for the initial release
-        // coming soon to a theatre near you
-//        setupRegisterDeviceReceiver();
-//        setupPushReceivedReceiver();
+        setupRegisterDeviceReceiver();
+        setupPushReceivedReceiver();
     }
 
     protected void onXWalkReady() {
@@ -178,8 +176,7 @@ public class MainActivity
         if (progress != null) {
             progress.dismiss();
         }
-        // uncomment for GCM when we go live with it !!
-//        registerForGCM();
+        registerForGCM();
     }
 
     private void setupRegisterDeviceReceiver() {
