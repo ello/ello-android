@@ -168,7 +168,9 @@ public class MainActivity
             isDeepLink = true;
         }
 
-        xWalkView.onNewIntent(intent);
+        if (isXWalkReady) {
+            xWalkView.onNewIntent(intent);
+        }
     }
 
     @JavascriptInterface
