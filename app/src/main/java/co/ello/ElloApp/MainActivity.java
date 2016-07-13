@@ -55,6 +55,7 @@ public class MainActivity
     public String path = "https://ello.co";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
+    private Boolean webAppReady = false;
     private Boolean isDeepLink = false;
     private BroadcastReceiver registerDeviceReceiver;
     private BroadcastReceiver pushReceivedReceiver;
@@ -112,6 +113,7 @@ public class MainActivity
         if(isXWalkReady) {
             xWalkView.resumeTimers();
             xWalkView.onShow();
+            registerForGCM();
         }
 
         if(!reachability.isNetworkConnected() || xWalkView == null) {
@@ -173,6 +175,7 @@ public class MainActivity
 
     @JavascriptInterface
     public void webAppLoaded() {
+        webAppReady = true;
         if (progress != null) {
             progress.dismiss();
         }
@@ -343,7 +346,7 @@ public class MainActivity
     }
 
     private void registerForGCM() {
-        if (checkPlayServices()) {
+        if (checkPlayServices() && webAppReady) {
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
         }
