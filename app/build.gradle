@@ -38,6 +38,7 @@ dependencies {
     apt 'com.google.dagger:dagger-compiler:2.3'
     compile 'com.google.dagger:dagger:2.3'
     compile 'com.nispok:snackbar:2.11.+'
+    compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.google.android.gms:play-services-gcm:9.2.0'
     compile "com.android.support:appcompat-v7:23.3.0"
     compile "com.android.support:support-v4:23.3.0"

@@ -5,6 +5,12 @@
     <string name="refresh"><u>Try Again</u></string>
     <string name="ello_logo">Ello Logo</string>
     <string name="error">Error</string>
+    <string name="camera_permission_title">Camera Access</string>
+    <string name="camera_permission_message">Ello would like to access your camera so you can use it to post photos.</string>
+    <string name="camera_permission_denied_title">Camera Access Denied</string>
+    <string name="camera_permission_denied_message">Please grant Ello camera access from your device settings and try again.</string>
+    <string name="external_write_permission_title">ACCESS TO WRITE EXTERNAL TITLE FPO</string>
+    <string name="external_write_permission_message">ACCESS TO WRITE EXTERNAL MESSAGE FPO</string>
     <string name="couldnt_connect_error">No Internet Connection</string>
     <string name="title_activity_no_internets">NoInternetsActivity</string>
     <string name="view">View</string>
