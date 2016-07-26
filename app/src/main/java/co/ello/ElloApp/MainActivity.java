@@ -62,8 +62,7 @@ public class MainActivity
     public XWalkView xWalkView;
     private ElloUIClient xWalkClient;
     private SwipeRefreshLayout swipeLayout;
-//    public String path = "http://10.1.10.159:6660";
-    public String path = "http://ello.co";
+    public String path = "https://ello.co";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
     private Boolean webAppReady = false;
