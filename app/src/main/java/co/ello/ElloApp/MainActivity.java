@@ -55,6 +55,7 @@ public class MainActivity
     public String path = "https://ello.co";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
+    private Boolean webAppReady = false;
     private Boolean isDeepLink = false;
     private BroadcastReceiver registerDeviceReceiver;
     private BroadcastReceiver pushReceivedReceiver;
@@ -69,10 +70,8 @@ public class MainActivity
         swipeLayout.setOnRefreshListener(this);
 
         setupWebView();
-        // don't register the device for the initial release
-        // coming soon to a theatre near you
-//        setupRegisterDeviceReceiver();
-//        setupPushReceivedReceiver();
+        setupRegisterDeviceReceiver();
+        setupPushReceivedReceiver();
     }
 
     protected void onXWalkReady() {
@@ -114,6 +113,7 @@ public class MainActivity
         if(isXWalkReady) {
             xWalkView.resumeTimers();
             xWalkView.onShow();
+            registerForGCM();
         }
 
         if(!reachability.isNetworkConnected() || xWalkView == null) {
@@ -175,11 +175,11 @@ public class MainActivity
 
     @JavascriptInterface
     public void webAppLoaded() {
+        webAppReady = true;
         if (progress != null) {
             progress.dismiss();
         }
-        // uncomment for GCM when we go live with it !!
-//        registerForGCM();
+        registerForGCM();
     }
 
     private void setupRegisterDeviceReceiver() {
@@ -346,7 +346,7 @@ public class MainActivity
     }
 
     private void registerForGCM() {
-        if (checkPlayServices()) {
+        if (checkPlayServices() && webAppReady) {
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
         }
