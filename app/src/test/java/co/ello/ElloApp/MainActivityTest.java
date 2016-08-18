@@ -45,26 +45,24 @@ public class MainActivityTest {
         assertNotNull(activity.xWalkView);
     }
 
-    // UNCOMMENT THESE WHEN PUSH GOES LIVE !!
+    @Test
+    public void registersReceiverForDeviceRegistered() throws Exception {
+        List<ShadowApplication.Wrapper> registeredReceivers = ShadowApplication.getInstance().getRegisteredReceivers();
 
-//    @Test
-//    public void registersReceiverForDeviceRegistered() throws Exception {
-//        List<ShadowApplication.Wrapper> registeredReceivers = ShadowApplication.getInstance().getRegisteredReceivers();
-//
-//        Assert.assertEquals(false, registeredReceivers.isEmpty());
-//        Intent intent = new Intent(ElloPreferences.REGISTRATION_COMPLETE);
-//        ShadowApplication shadowApplication = ShadowApplication.getInstance();
-//        assertTrue("is registered for REGISTRATION_COMPLETE", shadowApplication.hasReceiverForIntent(intent));
-//    }
-//
-//    @Test
-//    public void registersReceiverForPushNotifications() throws Exception {
-//        List<ShadowApplication.Wrapper> registeredReceivers = ShadowApplication.getInstance().getRegisteredReceivers();
-//
-//        Assert.assertEquals(false, registeredReceivers.isEmpty());
-//
-//        Intent intent = new Intent(ElloPreferences.PUSH_RECEIVED);
-//        ShadowApplication shadowApplication = ShadowApplication.getInstance();
-//        assertTrue("is registered for PUSH_RECEIVED", shadowApplication.hasReceiverForIntent(intent));
-//    }
+        Assert.assertEquals(false, registeredReceivers.isEmpty());
+        Intent intent = new Intent(ElloPreferences.REGISTRATION_COMPLETE);
+        ShadowApplication shadowApplication = ShadowApplication.getInstance();
+        assertTrue("is registered for REGISTRATION_COMPLETE", shadowApplication.hasReceiverForIntent(intent));
+    }
+
+    @Test
+    public void registersReceiverForPushNotifications() throws Exception {
+        List<ShadowApplication.Wrapper> registeredReceivers = ShadowApplication.getInstance().getRegisteredReceivers();
+
+        Assert.assertEquals(false, registeredReceivers.isEmpty());
+
+        Intent intent = new Intent(ElloPreferences.PUSH_RECEIVED);
+        ShadowApplication shadowApplication = ShadowApplication.getInstance();
+        assertTrue("is registered for PUSH_RECEIVED", shadowApplication.hasReceiverForIntent(intent));
+    }
 }
