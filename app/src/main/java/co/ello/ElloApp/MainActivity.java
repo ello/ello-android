@@ -37,6 +37,7 @@ import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
 
 import java.io.File;
+import java.util.Date;
 
 import javax.inject.Inject;
 
@@ -72,11 +73,13 @@ public class MainActivity
     private BroadcastReceiver imageResizeReceiver;
     private Boolean isXWalkReady = false;
     private Intent imageSelectedIntent;
+    private Date lastReloaded;
     TmpTarget target;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        lastReloaded = new Date();
         ((ElloApp) getApplication()).getNetComponent().inject(this);
         setContentView(R.layout.activity_main);
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.container);
@@ -108,7 +111,7 @@ public class MainActivity
             displayScreenContent();
         }
         if(isXWalkReady) {
-            xWalkView.reload(XWalkView.RELOAD_IGNORE_CACHE);
+            reloadXWalk();
             progress.show();
         }
         swipeLayout.setRefreshing(false);
@@ -123,6 +126,11 @@ public class MainActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        if(shouldHardRefresh()) {
+            shouldReload = true;
+        }
+
         inBackground = false;
         if(isXWalkReady) {
             xWalkView.resumeTimers();
@@ -135,9 +143,20 @@ public class MainActivity
         }
         else if(shouldReload && isXWalkReady) {
             shouldReload = false;
-            xWalkView.reload(XWalkView.RELOAD_IGNORE_CACHE);
+            reloadXWalk();
         }
         deepLinkWhenPresent();
+    }
+
+    private boolean shouldHardRefresh() {
+        Date now = new Date();
+        Date thirtyMinutesFromLastReloaded = new Date(lastReloaded.getTime() + (30 * 60 * 1000));
+        return now.compareTo(thirtyMinutesFromLastReloaded) == 0;
+    }
+
+    private void reloadXWalk() {
+        lastReloaded = new Date();
+        xWalkView.reload(XWalkView.RELOAD_IGNORE_CACHE);
     }
 
     protected boolean cameraGranted() {
