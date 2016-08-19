@@ -151,7 +151,7 @@ public class MainActivity
     private boolean shouldHardRefresh() {
         Date now = new Date();
         Date thirtyMinutesFromLastReloaded = new Date(lastReloaded.getTime() + (30 * 60 * 1000));
-        return now.compareTo(thirtyMinutesFromLastReloaded) == 0;
+        return now.compareTo(thirtyMinutesFromLastReloaded) > 0;
     }
 
     private void reloadXWalk() {
