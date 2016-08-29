@@ -10,33 +10,42 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
+import android.Manifest;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.WindowManager;
+import android.webkit.ValueCallback;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-
-// Using a 3rd party Snackbar because we can't extend
-// AppCompatActivity, thanks a lot XWalkActivity
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.nispok.snackbar.listeners.ActionClickListener;
+import com.squareup.picasso.Picasso;
 
 import org.xwalk.core.JavascriptInterface;
 import org.xwalk.core.XWalkActivity;
 import org.xwalk.core.XWalkPreferences;
 import org.xwalk.core.XWalkResourceClient;
+import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
+
+import java.io.File;
+import java.util.Date;
 
 import javax.inject.Inject;
 
 import co.ello.ElloApp.Dagger.ElloApp;
 import co.ello.ElloApp.PushNotifications.RegistrationIntentService;
+
+// Using a 3rd party Snackbar because we can't extend
+// AppCompatActivity, thanks a lot XWalkActivity
 
 
 public class MainActivity
@@ -44,6 +53,7 @@ public class MainActivity
         implements SwipeRefreshLayout.OnRefreshListener
 {
     private final static String TAG = MainActivity.class.getSimpleName();
+    private final static int MY_PERMISSIONS_REQUEST_CAMERA = 333;
 
     @Inject
     protected Reachability reachability;
@@ -51,17 +61,25 @@ public class MainActivity
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public static Boolean inBackground = true;
     public XWalkView xWalkView;
+    private ElloUIClient xWalkClient;
     private SwipeRefreshLayout swipeLayout;
     public String path = "https://ello.co";
     private ProgressDialog progress;
     private Boolean shouldReload = false;
+    private Boolean webAppReady = false;
+    private Boolean isDeepLink = false;
     private BroadcastReceiver registerDeviceReceiver;
     private BroadcastReceiver pushReceivedReceiver;
-    private boolean isXWalkReady = false;
+    private BroadcastReceiver imageResizeReceiver;
+    private Boolean isXWalkReady = false;
+    private Intent imageSelectedIntent;
+    private Date lastReloaded;
+    TmpTarget target;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        lastReloaded = new Date();
         ((ElloApp) getApplication()).getNetComponent().inject(this);
         setContentView(R.layout.activity_main);
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.container);
@@ -70,6 +88,7 @@ public class MainActivity
         setupWebView();
         setupRegisterDeviceReceiver();
         setupPushReceivedReceiver();
+        setupImageResizeReceiver();
     }
 
     protected void onXWalkReady() {
@@ -92,7 +111,8 @@ public class MainActivity
             displayScreenContent();
         }
         if(isXWalkReady) {
-            xWalkView.reload(XWalkView.RELOAD_IGNORE_CACHE);
+            reloadXWalk();
+            progress.show();
         }
         swipeLayout.setRefreshing(false);
     }
@@ -106,10 +126,16 @@ public class MainActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        if(shouldHardRefresh()) {
+            shouldReload = true;
+        }
+
         inBackground = false;
         if(isXWalkReady) {
             xWalkView.resumeTimers();
             xWalkView.onShow();
+            registerForGCM();
         }
 
         if(!reachability.isNetworkConnected() || xWalkView == null) {
@@ -117,9 +143,69 @@ public class MainActivity
         }
         else if(shouldReload && isXWalkReady) {
             shouldReload = false;
-            xWalkView.reload(XWalkView.RELOAD_IGNORE_CACHE);
+            reloadXWalk();
         }
         deepLinkWhenPresent();
+    }
+
+    private boolean shouldHardRefresh() {
+        Date now = new Date();
+        Date thirtyMinutesFromLastReloaded = new Date(lastReloaded.getTime() + (30 * 60 * 1000));
+        return now.compareTo(thirtyMinutesFromLastReloaded) > 0;
+    }
+
+    private void reloadXWalk() {
+        lastReloaded = new Date();
+        xWalkView.reload(XWalkView.RELOAD_IGNORE_CACHE);
+    }
+
+    protected boolean cameraGranted() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    protected boolean writeExternalGranted() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    protected boolean checkPermissions() {
+        if (!cameraGranted() || !writeExternalGranted()) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_CAMERA);
+        } else {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_CAMERA: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0) {
+
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        xWalkClient.openFileChooser();
+                    }
+                    else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.CAMERA)) {
+                            Alert.showCameraDenied(MainActivity.this);
+                        }
+                        else {
+                            Alert.showCameraDenied(MainActivity.this);
+                        }
+                    }
+                }
+                return;
+            }
+
+        }
     }
 
     @Override
@@ -140,6 +226,9 @@ public class MainActivity
         if (pushReceivedReceiver != null) {
             unregisterReceiver(pushReceivedReceiver);
         }
+        if (imageResizeReceiver != null) {
+            unregisterReceiver(imageResizeReceiver);
+        }
         super.onDestroy();
     }
 
@@ -153,17 +242,41 @@ public class MainActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        xWalkView.onActivityResult(requestCode, resultCode, intent);
+        target = new TmpTarget(this, "tmp.jpg");
+
+        if (intent != null && intent.getData() != null) {
+            Uri imageURI = intent.getData();
+            File bitmap = new File(imageURI.toString());
+
+            imageSelectedIntent = intent;
+            Picasso.with(MainActivity.this)
+                    .load(imageURI)
+                    .resize(1200, 3600)
+                    .centerInside()
+                    .onlyScaleDown()
+                    .into(target);
+        }
+        else {
+            xWalkView.onActivityResult(requestCode, resultCode, intent);
+        }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        xWalkView.onNewIntent(intent);
+        Uri data = intent.getData();
+        if (data != null) {
+            path = data.toString();
+            isDeepLink = true;
+        }
+
+        if (isXWalkReady) {
+            xWalkView.onNewIntent(intent);
+        }
     }
 
     @JavascriptInterface
     public void webAppLoaded() {
-        xWalkView.setAlpha(1.0f);
+        webAppReady = true;
         if (progress != null) {
             progress.dismiss();
         }
@@ -188,6 +301,26 @@ public class MainActivity
         };
 
         registerReceiver(registerDeviceReceiver, new IntentFilter(ElloPreferences.REGISTRATION_COMPLETE));
+    }
+
+    private void setupImageResizeReceiver() {
+        imageResizeReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String path = intent.getExtras().getString("RESIZED_IMAGE_PATH");
+
+                if(imageSelectedIntent != null && path != null) {
+                    Uri resizedURI = Uri.parse(path);
+                    if(resizedURI != null) {
+                        imageSelectedIntent.setData(resizedURI);
+                        xWalkView.onActivityResult(1, -1, imageSelectedIntent);
+                    }
+                }
+                imageSelectedIntent = null;
+            }
+        };
+
+        registerReceiver(imageResizeReceiver, new IntentFilter(ElloPreferences.IMAGE_RESIZED));
     }
 
     private void setupPushReceivedReceiver() {
@@ -224,25 +357,32 @@ public class MainActivity
         if (progress == null) {
             progress = createProgressDialog(MainActivity.this);
         }
-        progress.show();
 
         Uri data = getIntent().getData();
 
         Intent get = getIntent();
         String webUrl = get.getStringExtra("web_url");
-        if (webUrl != null) {
+        if (isXWalkReady && webUrl != null) {
             path = webUrl;
-            xWalkView.load(path, null);
-        } else if (data != null) {
+            loadPage(path);
+        } else if (isXWalkReady && data != null) {
             path = data.toString();
             getIntent().setData(null);
-            xWalkView.load(path, null);
+            loadPage(path);
+        } else if (isXWalkReady && isDeepLink) {
+            isDeepLink = false;
+            loadPage(path);
         }
+    }
+
+    private void loadPage(String page) {
+        xWalkView.load(page, null);
+        progress.show();
     }
 
     private void displayScreenContent() {
         if(reachability.isNetworkConnected()) {
-            xWalkView.load(path, null);
+            loadPage(path);
         } else {
             setupNoInternetView();
         }
@@ -257,7 +397,8 @@ public class MainActivity
     private void setupWebView() {
         xWalkView = (XWalkView) findViewById(R.id.activity_main_webview);
         xWalkView.setResourceClient(new ElloResourceClient(xWalkView));
-        xWalkView.setAlpha(0.0f);
+        xWalkClient = new ElloUIClient(xWalkView);
+        xWalkView.setUIClient(xWalkClient);
     }
 
     private String versionName() {
@@ -328,7 +469,7 @@ public class MainActivity
     }
 
     private void registerForGCM() {
-        if (checkPlayServices()) {
+        if (checkPlayServices() && webAppReady) {
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
         }
@@ -350,12 +491,40 @@ public class MainActivity
                 return true;
             }
         }
+    }
 
-        private String urlWithoutSlash(String url) {
-            if (url.endsWith("/")) {
-               url = url.substring(0, url.length() - 1);
-            }
-            return url;
+    class ElloUIClient extends XWalkUIClient {
+        public ElloUIClient(XWalkView xwalkView) {
+            super(xwalkView);
         }
+
+        private XWalkView view;
+        private ValueCallback<Uri> uploadMsg;
+        private String acceptType;
+        private String capture;
+
+        @Override
+        public void openFileChooser(
+                XWalkView view,
+                ValueCallback<Uri> uploadMsg,
+                String acceptType,
+                String capture)
+        {
+            boolean hasPermission = checkPermissions();
+            if(hasPermission) {
+                super.openFileChooser(view, uploadMsg, acceptType, capture);
+            }
+            else {
+                this.view = view;
+                this.uploadMsg = uploadMsg;
+                this.acceptType = acceptType;
+                this.capture = capture;
+            }
+        }
+
+        public void openFileChooser() {
+            this.openFileChooser(this.view, this.uploadMsg, this.acceptType, this.capture);
+        }
+
     }
 }
