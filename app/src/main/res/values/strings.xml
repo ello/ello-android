@@ -7,4 +7,5 @@
     <string name="error">Error</string>
     <string name="couldnt_connect_error">No Internet Connection</string>
     <string name="title_activity_no_internets">NoInternetsActivity</string>
+    <string name="view">View</string>
 </resources>
