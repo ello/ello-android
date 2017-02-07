@@ -27,7 +27,10 @@ import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.enums.SnackbarType;
 import com.nispok.snackbar.listeners.ActionClickListener;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+import static android.graphics.Bitmap.Config.RGB_565;
 
 import org.xwalk.core.JavascriptInterface;
 import org.xwalk.core.XWalkActivity;
@@ -72,6 +75,7 @@ public class MainActivity
     private BroadcastReceiver pushReceivedReceiver;
     private BroadcastReceiver imageResizeReceiver;
     private Boolean isXWalkReady = false;
+    private Boolean isPicking = false;
     private Intent imageSelectedIntent;
     private Date lastReloaded;
     TmpTarget target;
@@ -234,8 +238,15 @@ public class MainActivity
 
     @Override
     public void onTrimMemory(int level) {
+
         super.onTrimMemory(level);
-        if (level >= ComponentCallbacks2.TRIM_MEMORY_MODERATE) {
+        if (level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE) {
+            // This should happen automatically, but from some searching around, it
+            // seems like some phones don't always trigger a GC on low memory
+            System.gc();
+        }
+        // Don't reload if we've just selected an image
+        if (level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL && !isPicking) {
             shouldReload = true;
         }
     }
@@ -244,16 +255,20 @@ public class MainActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         target = new TmpTarget(this, "tmp.jpg");
 
+        isPicking = false;
+
         if (intent != null && intent.getData() != null) {
             Uri imageURI = intent.getData();
-            File bitmap = new File(imageURI.toString());
 
             imageSelectedIntent = intent;
             Picasso.with(MainActivity.this)
                     .load(imageURI)
+                    .config(RGB_565)
                     .resize(1200, 3600)
                     .centerInside()
                     .onlyScaleDown()
+                    .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
+                    .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
                     .into(target);
         }
         else {
@@ -281,6 +296,10 @@ public class MainActivity
             progress.dismiss();
         }
         registerForGCM();
+    }
+
+    public void setIsPicking() {
+        isPicking = true;
     }
 
     private void setupRegisterDeviceReceiver() {
@@ -510,11 +529,14 @@ public class MainActivity
                 String acceptType,
                 String capture)
         {
+            Context context = view.getContext();
+            if (context instanceof MainActivity) {
+                ((MainActivity)context).setIsPicking();
+            }
             boolean hasPermission = checkPermissions();
             if(hasPermission) {
                 super.openFileChooser(view, uploadMsg, acceptType, capture);
-            }
-            else {
+            } else {
                 this.view = view;
                 this.uploadMsg = uploadMsg;
                 this.acceptType = acceptType;

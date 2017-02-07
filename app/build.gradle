@@ -43,7 +43,7 @@ dependencies {
     compile "com.android.support:appcompat-v7:23.3.0"
     compile "com.android.support:support-v4:23.3.0"
     compile "com.android.support:design:23.3.0"
-    compile 'org.xwalk:xwalk_core_library_beta:19.49.514.2'
+    compile 'org.xwalk:xwalk_core_library:22.52.561.4'
     testApt 'com.google.guava:guava:19.0'
     testApt 'com.google.dagger:dagger-compiler:2.3'
     testCompile 'junit:junit:4.10'
