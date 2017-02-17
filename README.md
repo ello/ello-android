@@ -7,7 +7,22 @@ The app is a very simple wrapper around our React based web application. We hand
 
 ## Setup
 
-Nothing much to it. Clone and sync gradle and you should be good to go.
+Nothing much to it.
+
+1. Clone the repo `git clone git@github.com:ello/ello-android.git`
+- Download and install [Android Studio](https://developer.android.com/studio/index.html)
+- Follow the setup wizard
+  * Standard
+    - Use this if you don't already have the SDK downloaded
+  * Custom
+    1. Use this if you use the android SDK manager or Homebrew for SDK versions
+      as you will be able to modify the sdk path and can minimize what will get
+      downloaded initially
+    - Pick a light/dark theme
+    - Select path to an existing sdk like `usr/local/Cellar/android-sdk`
+    - Probably go with the recommended emulator settings
+    - Finish to download required SDK components
+- Open the project folder to install/update gradle
 
 ## Notes
 
