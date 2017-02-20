@@ -41,7 +41,7 @@ public class TmpTarget implements Target
             if(savedFile != null) {
                 Uri webURI = Uri.fromFile(savedFile);
                 Intent imageResized = new Intent(ElloPreferences.IMAGE_RESIZED);
-                if(webURI != null) {
+                if (webURI != null) {
                     imageResized.putExtra("RESIZED_IMAGE_PATH", webURI.getPath());
                     context.sendBroadcast(imageResized);
                 }
