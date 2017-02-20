@@ -30,7 +30,6 @@ import com.nispok.snackbar.listeners.ActionClickListener;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
-import static android.graphics.Bitmap.Config.RGB_565;
 
 import org.xwalk.core.JavascriptInterface;
 import org.xwalk.core.XWalkActivity;
@@ -263,7 +262,6 @@ public class MainActivity
             imageSelectedIntent = intent;
             Picasso.with(MainActivity.this)
                     .load(imageURI)
-                    .config(RGB_565)
                     .resize(1200, 3600)
                     .centerInside()
                     .onlyScaleDown()
