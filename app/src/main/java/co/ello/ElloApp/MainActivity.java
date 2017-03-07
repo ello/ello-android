@@ -1,5 +1,6 @@
 package co.ello.ElloApp;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
@@ -10,7 +11,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
-import android.Manifest;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -281,6 +281,14 @@ public class MainActivity
             progress.dismiss();
         }
         registerForGCM();
+    }
+
+    @JavascriptInterface
+    public void launchEditor() {
+        if (webAppReady) {
+            Intent intent = new Intent(this, MyReactActivity.class);
+            startActivity(intent);
+        }
     }
 
     private void setupRegisterDeviceReceiver() {

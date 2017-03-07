@@ -1,0 +1,15 @@
+{
+  "name": "ello-android",
+  "version": "1.4.0",
+  "main": "index.android.js",
+  "repository": "git@github.com:ello/ello-android.git",
+  "author": "Ryan Boyajian <ryan.e.boyajian@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start"
+  },
+  "dependencies": {
+    "react": "^15.4.2",
+    "react-native": "^0.42.0"
+  }
+}
